@@ -4,17 +4,18 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>Peihuan Develop</title>
+  <title>Android-图片存入系统相册更新显示 | Peihuan Develop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Peihuan Develop">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="在开发android的过程中，我们避免不了可能会涉及到做一个自定义相册或则会去本地创建一个文件夹来存储我们需要的图片。拿相册来说，比如我们创建一个test的文件夹，拍完一张照片后存储到这个指定的test文件夹里，然后在相册里面显示出来，就像微信的效果一样。拍完即可立即显示。但是，在实际开发过程中我们保存完一张图片后并不能立即更新显示出来这个图片，需要我们重启手机才能在系统相册中显示出来。这里先提供">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android-图片存入系统相册更新显示">
+<meta property="og:url" content="http://yoursite.com/2015/04/09/Android-图片存入系统相册更新显示/index.html">
 <meta property="og:site_name" content="Peihuan Develop">
-<meta property="og:description">
+<meta property="og:description" content="在开发android的过程中，我们避免不了可能会涉及到做一个自定义相册或则会去本地创建一个文件夹来存储我们需要的图片。拿相册来说，比如我们创建一个test的文件夹，拍完一张照片后存储到这个指定的test文件夹里，然后在相册里面显示出来，就像微信的效果一样。拍完即可立即显示。但是，在实际开发过程中我们保存完一张图片后并不能立即更新显示出来这个图片，需要我们重启手机才能在系统相册中显示出来。这里先提供">
+<meta property="og:updated_time" content="2016-04-09T17:27:46.489Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Peihuan Develop">
-<meta name="twitter:description">
+<meta name="twitter:title" content="Android-图片存入系统相册更新显示">
+<meta name="twitter:description" content="在开发android的过程中，我们避免不了可能会涉及到做一个自定义相册或则会去本地创建一个文件夹来存储我们需要的图片。拿相册来说，比如我们创建一个test的文件夹，拍完一张照片后存储到这个指定的test文件夹里，然后在相册里面显示出来，就像微信的效果一样。拍完即可立即显示。但是，在实际开发过程中我们保存完一张图片后并不能立即更新显示出来这个图片，需要我们重启手机才能在系统相册中显示出来。这里先提供">
   
     <link rel="alternative" href="/atom.xml" title="Peihuan Develop" type="application/atom+xml">
   
@@ -200,9 +201,7 @@
 	</div>
 </nav>
 
-      <div class="body-wrap">
-  
-    <article id="post-Android-图片存入系统相册更新显示" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-Android-图片存入系统相册更新显示" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
       <a href="/2015/04/09/Android-图片存入系统相册更新显示/" class="article-date">
@@ -218,178 +217,105 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/04/09/Android-图片存入系统相册更新显示/">Android-图片存入系统相册更新显示</a>
+    <h1 class="article-title" itemprop="name">
+      Android-图片存入系统相册更新显示
     </h1>
   
 
       </header>
       
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在开发android的过程中，我们避免不了可能会涉及到做一个自定义相册或则会去本地创建一个文件夹来存储我们需要的图片。拿相册来说，比如我们创建一个test的文件夹，拍完一张照片后存储到这个指定的test文件夹里，然后在相册里面显示出来，就像微信的效果一样。拍完即可立即显示。但是，在实际开发过程中我们保存完一张图片后并不能立即更新显示出来这个图片，需要我们重启手机才能在系统相册中显示出来。<br>这里先提供一个插入系统图库的方法：<br>     MediaStore.Images.Media.insertImage(getContentResolver(), mBitmap, “”, “”);<br>通过该方法即可把图片插入到系统图库中。但是，插入后并不会立即显示出来，需要发送一个广播：sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(“file://“+ Environment.getExternalStorageDirectory())));<br>来通知系统进行整个sd卡的扫描，如果sd里面的东西越多就会扫描的越久，并且扫描中我们不能访问sd卡，所以这样的实现方式对用户来说并不友好。<br>
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
+      <div class="article-info article-info-post">
+        
 	<div class="article-tag tagcloud">
 		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android-图片/">Android 图片</a></li></ul>
 	</div>
 
-      
-
-      
-        <p class="article-more-link">
-          <a  href="/2015/04/09/Android-图片存入系统相册更新显示/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-Android-异步消息处理机制2以及HandlerThread的介绍" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2015/03/15/Android-异步消息处理机制2以及HandlerThread的介绍/" class="article-date">
-  	<time datetime="2015-03-15T08:47:02.000Z" itemprop="datePublished">2015-03-15</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/03/15/Android-异步消息处理机制2以及HandlerThread的介绍/">Android-异步消息处理机制2以及HandlerThread的介绍</a>
-    </h1>
-  
 
-      </header>
+        <div class="clearfix"></div>
+      </div>
       
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>之间在上篇文章中介绍过了Android的异步消息处理机制，这里再进行一些补充，说下多线程中的消息处理以及HandlerThread的介绍，如果你还不是很了解handler的机制，可以先看看上篇文章Android-异步消息处理机制(Handler,Looper,Message)</p>
-<p>在上篇文章中开头说过我们平时在子线程中去更新ui的操作一般是通过handler来发送message的方式进行处理，但是其实还有几种更简便的方式来进行ui的操作：</p>
-<ol>
-<li>Handler的post()方法</li>
-<li>View的post()方法</li>
-<li><p>Activity的runOnUiThread()方法<br>代码如下：</p>
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android-消息机制/">Android 消息机制</a></li></ul>
-	</div>
+        <p>在开发android的过程中，我们避免不了可能会涉及到做一个自定义相册或则会去本地创建一个文件夹来存储我们需要的图片。拿相册来说，比如我们创建一个test的文件夹，拍完一张照片后存储到这个指定的test文件夹里，然后在相册里面显示出来，就像微信的效果一样。拍完即可立即显示。但是，在实际开发过程中我们保存完一张图片后并不能立即更新显示出来这个图片，需要我们重启手机才能在系统相册中显示出来。<br>这里先提供一个插入系统图库的方法：<br>     MediaStore.Images.Media.insertImage(getContentResolver(), mBitmap, “”, “”);<br>通过该方法即可把图片插入到系统图库中。但是，插入后并不会立即显示出来，需要发送一个广播：sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(“file://“+ Environment.getExternalStorageDirectory())));<br>来通知系统进行整个sd卡的扫描，如果sd里面的东西越多就会扫描的越久，并且扫描中我们不能访问sd卡，所以这样的实现方式对用户来说并不友好。<br><a id="more"></a><br>这里我们可以使用系统api:MediaScannerConnection给我们的方法来进行扫描更新：</p>
+<p>@Override<br>protected void onCreate(Bundle savedInstanceState) {<br>    super.onCreate(savedInstanceState);</p>
+<pre><code>mHandler.sendEmptyMessageDelayed(1, 2000);
 
+mConnection =new MediaScannerConnection(mContext,this);
+</code></pre><p>}</p>
+<p>@Override<br>public void onMediaScannerConnected() {<br>    mConnection.scanFile(“/sdcard/image.jpg”, “image/jpeg”);<br>}</p>
+<p>@Override<br>public void onScanCompleted(String s, Uri uri) {<br>    Log.v(“huan”, “scan completed”);<br>    mConnection.disconnect();<br>}</p>
+<p>但是该种方法我在使用过程中发现一个问题就是：传入的context会被MediaScannerConnection一直持有，导致oom。所以在使用过程中在activity使用时还需要注意。</p>
+<pre><code>另外我们还可以通过指定路径的方式来进行广播，这样就可以避免扫描整个sd卡：
+</code></pre><p>sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(“file://“ + Environment.getExternalStorageDirectory() + picPath)));</p>
+<pre><code>图片更新的技巧和注意事项分享给大家，希望对你有帮助。
+</code></pre>
       
-
-      
-        <p class="article-more-link">
-          <a  href="/2015/03/15/Android-异步消息处理机制2以及HandlerThread的介绍/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
     </div>
     
   </div>
   
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2015/03/15/Android-异步消息处理机制2以及HandlerThread的介绍/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Android-异步消息处理机制2以及HandlerThread的介绍</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
 </article>
 
 
-
-
-
-
-
-
-
-  
-    <article id="post-Android-异步消息处理机制-Handler-Looper-Message" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2015/03/10/Android-异步消息处理机制-Handler-Looper-Message/" class="article-date">
-  	<time datetime="2015-03-09T16:43:15.000Z" itemprop="datePublished">2015-03-10</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/03/10/Android-异步消息处理机制-Handler-Looper-Message/">Android-异步消息处理机制-Handler,Looper,Message</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>相信大部分开发android的人使用Handler在子线程上去进行ui的操作这种模式已经滚瓜烂熟了，但是当你不去深入研究它的原理，和理清它与Looper和Message之间的关系时，遇到问题和bug的时候你就会无从下手，手忙脚乱。</p>
-<p>技术也是一门学问，只知其一不知其二，你永远只会停留在基础。送给自己也是送给大家的一句话：你若不想做，总会找到借口；你若真想做，总会找到方法！</p>
-<p>开始进入正题，什么是异步消息处理机制？<br>就应用程序而已，android系统中java的应用程序和其他系统上相同，都是靠消息驱动来工作的，它们的大致工作原理是：<br>＊有一个消息队列，可以往这个消息队列中不断投递消息（进）<br>＊有一个消息循环，可以不断的从这个消息队列中取出消息，进行处理。（出）<br>事件源把待处理的消息加入到消息队列中（默认是加至队尾，但是也会遇到插队的情况出现，而且不是插中间，直接插入至队列头，这种是属于大哥级别的消息），处理线程从消息队列头不断取出消息分发给对应的target进行处理。这种实现模式在android上主要就是靠我们的Handler，Looper来实现。</p>
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android-消息机制/">Android 消息机制</a></li></ul>
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+    <a class="jiathis_button_twitter"></a>
+    <a class="jiathis_button_plus"></a> 
+    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
 	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a  href="/2015/03/10/Android-异步消息处理机制-Handler-Looper-Message/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
 
 
 
 
 
 
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="Android-图片存入系统相册更新显示" data-title="Android-图片存入系统相册更新显示" data-url="http://yoursite.com/2015/04/09/Android-图片存入系统相册更新显示/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
 
 
 
-  
-  
+
 </div>
       <footer id="footer">
   <div class="outer">
@@ -413,8 +339,8 @@
 		fancybox: true,
 		mathjax: true,
 		animate: true,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
