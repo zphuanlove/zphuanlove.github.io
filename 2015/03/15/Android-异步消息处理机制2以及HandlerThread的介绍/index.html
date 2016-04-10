@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Peihuan Develop">
 <meta property="og:description" content="之间在上篇文章中介绍过了Android的异步消息处理机制，这里再进行一些补充，说下多线程中的消息处理以及HandlerThread的介绍，如果你还不是很了解handler的机制，可以先看看上篇文章Android-异步消息处理机制(Handler,Looper,Message)
 在上篇文章中开头说过我们平时在子线程中去更新ui的操作一般是通过handler来发送message的方式进行处理，但是其实">
-<meta property="og:updated_time" content="2016-04-09T17:27:34.451Z">
+<meta property="og:updated_time" content="2016-04-10T04:45:32.023Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android-异步消息处理机制2以及HandlerThread的介绍">
 <meta name="twitter:description" content="之间在上篇文章中介绍过了Android的异步消息处理机制，这里再进行一些补充，说下多线程中的消息处理以及HandlerThread的介绍，如果你还不是很了解handler的机制，可以先看看上篇文章Android-异步消息处理机制(Handler,Looper,Message)
@@ -36,7 +36,7 @@
 	<header id="header" class="inner">
 		<a href="/" class="profilepic">
 			
-			<img lazy-src="http://img1.imgtn.bdimg.com/it/u=1567979154,597743275&amp;fm=21&amp;gp=0.jpg" class="js-avatar">
+			<img lazy-src="http://a3.qpic.cn/psb?/03309acd-d98d-43b8-8600-12060f1e8dad/zD9JoerIVi*hl7ReygDrJRdbe1PjNv3MldppM*.8agM!/b/dHABAAAAAAAA&amp;bo=QwL1AQAAAAAFB5E!&amp;rf=viewer_4" class="js-avatar">
 			
 		</a>
 
@@ -60,16 +60,6 @@
 							<div class="ribbon"></div>
 						</div>
 						
-						<div class="icon-wrap icon-link hide" data-idx="2">
-							<div class="loopback_l"></div>
-							<div class="loopback_r"></div>
-						</div>
-						
-						
-						<div class="icon-wrap icon-me hide" data-idx="3">
-							<div class="user"></div>
-							<div class="shoulder"></div>
-						</div>
 						
 					</div>
 					
@@ -80,10 +70,6 @@
 						<li>Menu</li>
 						<li>Tags</li>
 						
-						<li>Links</li>
-						
-						
-						<li>About</li>
 						
 					</ul>
 				</div>
@@ -105,13 +91,13 @@
 					<nav class="header-nav">
 						<div class="social">
 							
-								<a class="github" target="_blank" href="/" title="github">github</a>
+								<a class="github" target="_blank" href="https://github.com/zphuanlove/zphuanlove.github.io" title="github">github</a>
 					        
-								<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+								<a class="weibo" target="_blank" href="http://weibo.com/1912181305/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
 					        
-								<a class="rss" target="_blank" href="#" title="rss">rss</a>
+								<a class="facebook" target="_blank" href="#" title="facebook">facebook</a>
 					        
-								<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+								<a class="google" target="_blank" href="#" title="google">google</a>
 					        
 						</div>
 					</nav>
@@ -120,37 +106,13 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/Android-图片/" style="font-size: 10px;">Android 图片</a> <a href="/tags/Android-消息机制/" style="font-size: 20px;">Android 消息机制</a>
+						<a href="/tags/Android-图片/" style="font-size: 10px;">Android 图片</a> <a href="/tags/Android-控件/" style="font-size: 10px;">Android 控件</a> <a href="/tags/Android-消息机制/" style="font-size: 20px;">Android 消息机制</a>
 					</div>
 				</section>
 				
 				
 				
-				<section class="switch-part switch-part3">
-					<div id="js-friends">
-					
-			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">奥巴马的博客</a>
-			        
-			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">卡卡的美丽传说</a>
-			        
-			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">本泽马的博客</a>
-			        
-			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">吉格斯的博客</a>
-			        
-			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">习大大大不同</a>
-			        
-			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">托蒂的博客</a>
-			        
-			        </div>
-				</section>
-				
 
-				
-				
-				<section class="switch-part switch-part4">
-				
-					<div id="js-aboutme">我是谁，我从哪里来，我到哪里去？我就是我，是颜色不一样的吃货…</div>
-				</section>
 				
 			</div>
 		</div>
@@ -168,7 +130,7 @@
 		<header id="header" class="inner">
 			<div class="profilepic">
 			
-				<img lazy-src="http://img1.imgtn.bdimg.com/it/u=1567979154,597743275&amp;fm=21&amp;gp=0.jpg" class="js-avatar">
+				<img lazy-src="http://a3.qpic.cn/psb?/03309acd-d98d-43b8-8600-12060f1e8dad/zD9JoerIVi*hl7ReygDrJRdbe1PjNv3MldppM*.8agM!/b/dHABAAAAAAAA&amp;bo=QwL1AQAAAAAFB5E!&amp;rf=viewer_4" class="js-avatar">
 			
 			</div>
 			<hgroup>
@@ -190,13 +152,13 @@
 			<nav class="header-nav">
 				<div class="social">
 					
-						<a class="github" target="_blank" href="/" title="github">github</a>
+						<a class="github" target="_blank" href="https://github.com/zphuanlove/zphuanlove.github.io" title="github">github</a>
 			        
-						<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+						<a class="weibo" target="_blank" href="http://weibo.com/1912181305/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
 			        
-						<a class="rss" target="_blank" href="#" title="rss">rss</a>
+						<a class="facebook" target="_blank" href="#" title="facebook">facebook</a>
 			        
-						<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+						<a class="google" target="_blank" href="#" title="google">google</a>
 			        
 				</div>
 			</nav>
@@ -248,105 +210,217 @@
 <li>View的post()方法</li>
 <li><p>Activity的runOnUiThread()方法<br>代码如下：</p>
 <a id="more"></a>
-<p>new Thread(new Runnable() {<br> @Override<br> public void run() {</p>
-<pre><code>//1.普遍的方式
-//发送消息
-Message msg = Message.obtain();
-msg.what = 111;
-Bundle bundle=new Bundle();
-bundle.putString(&quot;huan&quot;,&quot;hello&quot;);
-msg.setData(bundle);
-mHandler.sendMessage(msg);
+<p> new Thread(new Runnable() {</p>
+<pre><code>@Override
+public void run() {
+    //1.普遍的方式
+    //发送消息
+    Message msg = Message.obtain();
+    msg.what = 111;
+    Bundle bundle=new Bundle();
+    bundle.putString(&quot;huan&quot;,&quot;hello&quot;);
+    msg.setData(bundle);
+    mHandler.sendMessage(msg);
 
-//2.post的方式
-mHandler.post(new Runnable() {
-    @Override
-    public void run() {
-        //可以直接在这儿进行ui的更新
-    }
-});
+    //2.post的方式
+    mHandler.post(new Runnable() {
+        @Override
+        public void run() {
+            //可以直接在这儿进行ui的更新
+        }
+    });
 
-//3.view.post方式
-mTvHelloWord.post(new Runnable() {
-    @Override
-    public void run() {
-        //可以直接在这儿进行ui的更新
-    }
-});
+    //3.view.post方式
+    mTvHelloWord.post(new Runnable() {
+        @Override
+        public void run() {
+            //可以直接在这儿进行ui的更新
+        }
+    });
 
-//4.runOnUiThread方式
-runOnUiThread(new Runnable() {
-    @Override
-    public void run() {
-        //可以直接在这儿进行ui的更新
-    }
-});
-</code></pre><p> }<br>}).start();</p>
+    //4.runOnUiThread方式
+    runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+            //可以直接在这儿进行ui的更新
+        }
+    });
+}
+</code></pre><p> }).start();</p>
 </li>
 </ol>
 <p>从代码中可以明显的看出，后面三种方式要简便的多，而且是一种比一种简便，都不需要通过Message 的创建去封装消息；第二种方式还需要使用handler作为载体，第三种方式需要使用view来作为载体，第四种方式直接用runOnUiThread方法即可。为什么可以这样写也能达到目的？进去看看知道了。</p>
-<p>1⃣️先说下handler post方式的使用，我们不需要再去创建一个Message对象，把数据封装在Message中，然后在handler的callback中进行ui的操作，而是直接可以在run中进行操作。进入到post方法中：<br>public final boolean post(Runnable r)<br>{<br>   return  sendMessageDelayed(getPostMessage(r), 0);<br>}</p>
-<p>所噶，原来还是通过sendMessageDelayed(Message msg, long delayMillis)这个方法来进行操作的，并且将我们传入的runnable对象通过getPostMessage方法转为了一个Message;那我们再进入getPostMessage方法中一看应该就能明了了：<br>private static Message getPostMessage(Runnable r) {<br>    Message m = Message.obtain();<br>    m.callback = r;<br>    return m;<br>}</p>
-<p>创建了一个消息，并把这个消息的callback设置为了我们传入的runnnable；还记得我们上篇文章说过的在Looper进行消息循环的时候，取出来的消息将会通过dispatchMessage这个方法进行处理：<br>public void dispatchMessage(Message msg) {<br>    if (msg.callback != null) {<br>        handleCallback(msg);<br>    } else {<br>        if (mCallback != null) {<br>            if (mCallback.handleMessage(msg)) {<br>                return;<br>            }<br>        }<br>        handleMessage(msg);<br>    }<br>}</p>
-<p>首先判断的就是msg的callback是否为null，如果不为null就会执行handleCallback(msg)：<br>private static void handleCallback(Message message) {<br>    message.callback.run();<br>}</p>
-<p>直接调用了msg的runnable对象也就是我们一开始传给msg的runnable对象，瞬间就很清晰明了了。</p>
-<p>2⃣️view.post方式<br>view.post方法和handler的写法几乎一致，看看它的里面实现了什么：<br>public boolean post(Runnable action) {<br>    final AttachInfo attachInfo = mAttachInfo;<br>    if (attachInfo != null) {<br>        return attachInfo.mHandler.post(action);<br>    }<br>    // Assume that post will succeed later<br>    ViewRootImpl.getRunQueue().post(action);<br>    return true;<br>}</p>
-<p>原来就是通过attachInfo获取到了handler，然后执行handler的post方法而已。换汤不换药。</p>
-<p>3⃣️runOnUiThread方式<br>这个方法其实是属于Activity的方法，也就是只能在Activity中才能使用，代码如下：<br>public final void runOnUiThread(Runnable action) {<br>    if (Thread.currentThread() != mUiThread) {<br>        mHandler.post(action);<br>    } else {<br>        action.run();<br>    }<br>}</p>
-<p>首先判断了当前线程是否是ui线程，如果不是，就用handler post的方式；否则就直接run。</p>
-<p>看完了这三种方式的源代码发现其实底层都是通过handler发送message 的方式来进行消息的处理；所以平时我们在开发android的过程中如果明白了handler的消息机制；那么这几种方法你都是可以任意使用的，哪种方便用哪种。</p>
-<p>Looper和handler的同步关系：<br>接下来说下在多线程中handler和looper的处理；先模拟一个运行场景：<br>1主线程中开启一个线程1；线程1开启的时候会启动线程2；<br>2线程2启动后获取到Looper,并执行looper.loop ；<br>3将线程2中的looper对象赋值给线程1中的looper对象<br>4通过线程1中的looper对象，在主线程中创建一个hanlder对象；<br>5通过handler发送一个msg，请问这个msg是在哪个线程中收到这个消息并进行处理；</p>
-<p>看下代码：<br>线程1:<br>public class LooperThread1 extends Thread {</p>
-<pre><code>/**
- * 定义一个public的成员变量Looper
- */
-public Looper myLooper = null;
-
-/**
- * 初始化Looper,开启消息循环
- */
-public void initLooper(){
-    Looper.prepare();
-    myLooper = Looper.myLooper();
-    Looper.loop();
-}
-
-@Override
-public void run() {
-    //开启另一个线程
-    Thread thread2 = new Thread(new Runnable() {
-        @Override
-        public void run() {
-            initLooper();
-        }
-    });
-    thread2.start();
-    Log.e(&quot;test&quot;, &quot;thread2 id:&quot; + thread2.getId());
-}
-</code></pre><p>}</p>
-<p>主线程：<br>//主线程id<br>Log.e(“test”, “Main Thread:” + Thread.currentThread().getId());<br>LooperThread1 myLooperThread1=new LooperThread1();<br>myLooperThread1.start();<br>//线程1 id<br>Log.e(“test”,”thread1 id:”+myLooperThread1.getId());<br>Looper looper=myLooperThread1.myLooper;<br>android.os.Handler handler=new android.os.Handler(looper, new android.os.Handler.Callback() {<br>    @Override<br>    public boolean handleMessage(Message msg) {<br>        if(msg.what==111){<br>            Log.e(“test”,”handleMessage :111”);<br>            //当前线程<br>            Log.e(“test”,”current Thread:”+Thread.currentThread().getId());<br>        }<br>        return false;<br>    }<br>});<br>handler.sendEmptyMessage(111);</p>
-<p>最开始我是为了验证这个handler发送的消息最终是在哪个线程中接收，但是其实这段代码是有问题的，一运行会报java.lang.NullPointerException。具体的原因就在与：创建handler的时候，传入的这个looper为空。我们在获取线程1的looper对象时，这个时候可能线程2还没有执行完获取到looper；所以问题就出在这儿；不过我们可以加一个同步锁的方式来解决，但是如果每次写你都去这样操作那不是很麻烦？  所以，android给我们推荐了一个 HandlerThread线程来解决多线程中handler和looper之间同步的问题。</p>
-<p>HandlerThread中的源码：<br>@Override<br>public void run() {<br>    mTid = Process.myTid();<br>    Looper.prepare();<br>    synchronized (this) {<br>        mLooper = Looper.myLooper();<br>        notifyAll();<br>    }<br>    Process.setThreadPriority(mPriority);<br>    onLooperPrepared();<br>    Looper.loop();<br>    mTid = -1;<br>}</p>
-<p>/**</p>
-<ul>
-<li>This method returns the Looper associated with this thread. If this thread not been started</li>
-<li>or for any reason is isAlive() returns false, this method will return null. If this thread </li>
-<li>has been started, this method will block until the looper has been initialized. </li>
-<li><p>@return The looper.<br>*/<br>public Looper getLooper() {<br> if (!isAlive()) {</p>
-<pre><code>return null;
+<ol>
+<li><p>先说下handler post方式的使用，我们不需要再去创建一个Message对象，把数据封装在Message中，然后在handler的callback中进行ui的操作，而是直接可以在run中进行操作。进入到post方法中：</p>
+<p> public final boolean post(Runnable r)<br> {</p>
+<pre><code>return  sendMessageDelayed(getPostMessage(r), 0);
 </code></pre><p> }</p>
-<p> // If the thread has been started, wait until the looper has been created.<br> synchronized (this) {</p>
-<pre><code>while (isAlive() &amp;&amp; mLooper == null) {
-    try {
-        wait();
-    } catch (InterruptedException e) {
+</li>
+</ol>
+<p>所噶，原来还是通过sendMessageDelayed(Message msg, long delayMillis)这个方法来进行操作的，并且将我们传入的runnable对象通过getPostMessage方法转为了一个Message;那我们再进入getPostMessage方法中一看应该就能明了了：</p>
+<pre><code>private static Message getPostMessage(Runnable r) {
+    Message m = Message.obtain();
+    m.callback = r;
+    return m;
+}
+</code></pre><p>创建了一个消息，并把这个消息的callback设置为了我们传入的runnnable；还记得我们上篇文章说过的在Looper进行消息循环的时候，取出来的消息将会通过dispatchMessage这个方法进行处理：</p>
+<pre><code>public void dispatchMessage(Message msg) {
+    if (msg.callback != null) {
+        handleCallback(msg);
+    } else {
+        if (mCallback != null) {
+            if (mCallback.handleMessage(msg)) {
+                return;
+            }
+        }
+        handleMessage(msg);
     }
 }
-</code></pre><p> }<br> return mLooper;<br>}</p>
+</code></pre><p>首先判断的就是msg的callback是否为null，如果不为null就会执行handleCallback(msg)：</p>
+<pre><code>private static void handleCallback(Message message) {
+    message.callback.run();
+}
+</code></pre><p>直接调用了msg的runnable对象也就是我们一开始传给msg的runnable对象，瞬间就很清晰明了了。</p>
+<ol>
+<li><p>view.post方式<br>view.post方法和handler的写法几乎一致，看看它的里面实现了什么：</p>
+<p> public boolean post(Runnable action) {</p>
+<pre><code>final AttachInfo attachInfo = mAttachInfo;
+if (attachInfo != null) {
+    return attachInfo.mHandler.post(action);
+}
+// Assume that post will succeed later
+ViewRootImpl.getRunQueue().post(action);
+return true;
+</code></pre><p> }</p>
 </li>
-</ul>
-<p>其实就是加上了一个同步锁的机制，并且在run中自动帮我们创建好了looper；那么我们接下来再来验证下消息的处理是在哪个线程：<br>//主线程id<br>Log.e(“test”, “Main Thread:” + Thread.currentThread().getId());<br>HandlerThread handlerThread = new HandlerThread(“handler_thread”);<br>handlerThread.start();<br>Log.e(“test”, “HandlerThread:” + handlerThread.getId());<br>android.os.Handler handler=new android.os.Handler(handlerThread.getLooper(), new android.os.Handler.Callback() {<br>    @Override<br>    public boolean handleMessage(Message msg) {<br>        if(msg.what==222){<br>            Log.e(“test”,”receiveMsh thread id:”+Thread.currentThread().getId());<br>        }<br>        return false;<br>    }<br>});<br>handler.sendEmptyMessage(222);</p>
-<p>打印log为：</p>
+</ol>
+<p>原来就是通过attachInfo获取到了handler，然后执行handler的post方法而已。换汤不换药。</p>
+<ol>
+<li><p>runOnUiThread方式<br>这个方法其实是属于Activity的方法，也就是只能在Activity中才能使用，代码如下：</p>
+<p> public final void runOnUiThread(Runnable action) {</p>
+<pre><code>if (Thread.currentThread() != mUiThread) {
+    mHandler.post(action);
+} else {
+    action.run();
+}
+</code></pre><p> }</p>
+</li>
+</ol>
+<p>首先判断了当前线程是否是ui线程，如果不是，就用handler post的方式；否则就直接run。</p>
+<p>看完了这三种方式的源代码发现其实底层都是通过handler发送message 的方式来进行消息的处理；所以平时我们在开发android的过程中如果明白了handler的消息机制；那么这几种方法你都是可以任意使用的，哪种方便用哪种。</p>
+<h2 id="Looper和handler的同步关系："><a href="#Looper和handler的同步关系：" class="headerlink" title="Looper和handler的同步关系："></a>Looper和handler的同步关系：</h2><p>接下来说下在多线程中handler和looper的处理；先模拟一个运行场景：</p>
+<ol>
+<li>主线程中开启一个线程1；线程1开启的时候会启动线程2；</li>
+<li>线程2启动后获取到Looper,并执行looper.loop ；</li>
+<li>将线程2中的looper对象赋值给线程1中的looper对象</li>
+<li>通过线程1中的looper对象，在主线程中创建一个hanlder对象；</li>
+<li>通过handler发送一个msg，请问这个msg是在哪个线程中收到这个消息并进行处理；</li>
+</ol>
+<p>看下代码：<br>线程1:</p>
+<pre><code>public class LooperThread1 extends Thread {
+
+    /**
+     * 定义一个public的成员变量Looper
+     */
+    public Looper myLooper = null;
+
+    /**
+     * 初始化Looper,开启消息循环
+     */
+    public void initLooper(){
+        Looper.prepare();
+        myLooper = Looper.myLooper();
+        Looper.loop();
+    }
+
+    @Override
+    public void run() {
+        //开启另一个线程
+        Thread thread2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                initLooper();
+            }
+        });
+        thread2.start();
+        Log.e(&quot;test&quot;, &quot;thread2 id:&quot; + thread2.getId());
+    }
+}
+</code></pre><p>主线程：</p>
+<pre><code>//主线程id
+Log.e(&quot;test&quot;, &quot;Main Thread:&quot; + Thread.currentThread().getId());
+LooperThread1 myLooperThread1=new LooperThread1();
+myLooperThread1.start();
+//线程1 id
+Log.e(&quot;test&quot;,&quot;thread1 id:&quot;+myLooperThread1.getId());
+Looper looper=myLooperThread1.myLooper;
+android.os.Handler handler=new android.os.Handler(looper, new android.os.Handler.Callback() {
+    @Override
+    public boolean handleMessage(Message msg) {
+        if(msg.what==111){
+            Log.e(&quot;test&quot;,&quot;handleMessage :111&quot;);
+            //当前线程
+            Log.e(&quot;test&quot;,&quot;current Thread:&quot;+Thread.currentThread().getId());
+        }
+        return false;
+    }
+});
+handler.sendEmptyMessage(111);
+</code></pre><p>最开始我是为了验证这个handler发送的消息最终是在哪个线程中接收，但是其实这段代码是有问题的，一运行会报java.lang.NullPointerException。具体的原因就在与：创建handler的时候，传入的这个looper为空。我们在获取线程1的looper对象时，这个时候可能线程2还没有执行完获取到looper；所以问题就出在这儿；不过我们可以加一个同步锁的方式来解决，但是如果每次写你都去这样操作那不是很麻烦？  所以，android给我们推荐了一个 HandlerThread线程来解决多线程中handler和looper之间同步的问题。</p>
+<p>HandlerThread中的源码：</p>
+<pre><code>@Override
+public void run() {
+    mTid = Process.myTid();
+    Looper.prepare();
+    synchronized (this) {
+        mLooper = Looper.myLooper();
+        notifyAll();
+    }
+    Process.setThreadPriority(mPriority);
+    onLooperPrepared();
+    Looper.loop();
+    mTid = -1;
+}
+
+/**
+ * This method returns the Looper associated with this thread. If this thread not been started
+ * or for any reason is isAlive() returns false, this method will return null. If this thread 
+ * has been started, this method will block until the looper has been initialized. 
+ * @return The looper.
+ */
+public Looper getLooper() {
+    if (!isAlive()) {
+        return null;
+    }
+
+    // If the thread has been started, wait until the looper has been created.
+    synchronized (this) {
+        while (isAlive() &amp;&amp; mLooper == null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+    return mLooper;
+}
+</code></pre><p>其实就是加上了一个同步锁的机制，并且在run中自动帮我们创建好了looper；那么我们接下来再来验证下消息的处理是在哪个线程：</p>
+<pre><code>//主线程id
+Log.e(&quot;test&quot;, &quot;Main Thread:&quot; + Thread.currentThread().getId());
+HandlerThread handlerThread = new HandlerThread(&quot;handler_thread&quot;);
+handlerThread.start();
+Log.e(&quot;test&quot;, &quot;HandlerThread:&quot; + handlerThread.getId());
+android.os.Handler handler=new android.os.Handler(handlerThread.getLooper(), new android.os.Handler.Callback() {
+    @Override
+    public boolean handleMessage(Message msg) {
+        if(msg.what==222){
+            Log.e(&quot;test&quot;,&quot;receiveMsh thread id:&quot;+Thread.currentThread().getId());
+        }
+        return false;
+    }
+});
+handler.sendEmptyMessage(222);
+</code></pre><p>打印log为：</p>
 <p>得出结论：handler发送的Message处理，不会依赖与创建handler时所在的线程，依赖与传入的looper对象所在的线程，looper所在的线程来执行msg的处理；</p>
 <p>到这里，通过两篇文章总算是将handler这个知识点大部分总结完了；接下来会继续总结其他技术点的知识；如果文章有疏漏，错误，望君能给我评论指出。谢谢！</p>
 
