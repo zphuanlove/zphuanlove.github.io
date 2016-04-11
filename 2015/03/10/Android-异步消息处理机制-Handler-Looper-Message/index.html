@@ -16,7 +16,7 @@
 <meta property="og:description" content="相信大部分开发android的人使用Handler在子线程上去进行ui的操作这种模式已经滚瓜烂熟了，但是当你不去深入研究它的原理，和理清它与Looper和Message之间的关系时，遇到问题和bug的时候你就会无从下手，手忙脚乱。
 技术也是一门学问，只知其一不知其二，你永远只会停留在基础。送给自己也是送给大家的一句话：你若不想做，总会找到借口；你若真想做，总会找到方法！
 开始进入正题，什么是异步消">
-<meta property="og:updated_time" content="2016-04-09T17:27:36.004Z">
+<meta property="og:updated_time" content="2016-04-11T08:56:06.749Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android-异步消息处理机制-Handler,Looper,Message">
 <meta name="twitter:description" content="相信大部分开发android的人使用Handler在子线程上去进行ui的操作这种模式已经滚瓜烂熟了，但是当你不去深入研究它的原理，和理清它与Looper和Message之间的关系时，遇到问题和bug的时候你就会无从下手，手忙脚乱。
@@ -211,84 +211,17 @@
 <p>开始进入正题，什么是异步消息处理机制？<br>就应用程序而已，android系统中java的应用程序和其他系统上相同，都是靠消息驱动来工作的，它们的大致工作原理是：<br>＊有一个消息队列，可以往这个消息队列中不断投递消息（进）<br>＊有一个消息循环，可以不断的从这个消息队列中取出消息，进行处理。（出）<br>事件源把待处理的消息加入到消息队列中（默认是加至队尾，但是也会遇到插队的情况出现，而且不是插中间，直接插入至队列头，这种是属于大哥级别的消息），处理线程从消息队列头不断取出消息分发给对应的target进行处理。这种实现模式在android上主要就是靠我们的Handler，Looper来实现。</p>
 <a id="more"></a>
 <p>为什么需要设计这样的一种机制来进行处理，因为我们都知道Android UI线程是不安全的，如果尝试在非ui线程上去进行ui的更新，这个时候程序是有可能会崩溃的。那么android推荐的处理方式是：在你的当前activity也就是ui线程上创建一个Handler，并实现它的callback：handleMessage,<br>当你需要在子线程上去进行ui更新的时候，创建一个Message，通过handler发送出去，在handleMessage中接收到这个message对象进行ui更新。</p>
-<h2 id="一-Handler"><a href="#一-Handler" class="headerlink" title="一.Handler"></a>一.Handler</h2><p>我们平时在开发的过程中都会选择直接去new一个Handler,如下代码：</p>
-<pre><code>private Handler mHandler=new Handler(new Handler.Callback() {
-    @Override
-    public boolean handleMessage(Message msg) {
-        return false;
-    }
-});
-</code></pre><p> 然后在线程中通过Message来组装需要传递到ui线程的数据，让handler来进行发送，代码如下：</p>
-<pre><code>new Thread(new Runnable() {
-    @Override
-    public void run() {
-        //发送消息
-        Message msg = Message.obtain();
-        msg.what = 111;
-        Bundle bundle=new Bundle();
-        bundle.putString(&quot;huan&quot;,&quot;hello&quot;);
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
-    }
-}).start();
-</code></pre><p>这样就可以在主线程的handler回调callback中接收到这个消息并进行处理：</p>
-<pre><code>@Override
-public boolean handleMessage(Message msg) {
-    if(msg.what==111){
-        //取出数据
-        String str = msg.getData().getString(&quot;huan&quot;);
-        //...进行ui更新
-    }
-    return false;
-}
-</code></pre><p>这样一套基本的异步更新ui的流程就走完了。但是当写完这些代码的时候有没有想过为什么这样子做可以实现？表面上看我们紧紧就是new 了一个handler和一个messsage作为载体就达到了这样的效果，但是实际底层的实现却比这复杂的多。下面我们可以一起进入源码来看看到底里面是如何实现的。<br>先来看看handler的构造方法：<br>我们平时只实现了callback这一个参数，点进去一看发现其实是：</p>
-<pre><code>public Handler(Callback callback) {
-    this(callback, false);
-}
-</code></pre><p>下面的 才是最终的一个实现：</p>
-<pre><code>public Handler(Callback callback, boolean async) {
-    if (FIND_POTENTIAL_LEAKS) {
-        final Class&lt;? extends Handler&gt; klass = getClass();
-        if ((klass.isAnonymousClass() || klass.isMemberClass() || klass.isLocalClass()) &amp;&amp;
-                (klass.getModifiers() &amp; Modifier.STATIC) == 0) {
-            Log.w(TAG, &quot;The following Handler class should be static or leaks might occur: &quot; +
-                klass.getCanonicalName());
-        }
-    }
-
-    mLooper = Looper.myLooper();
-    if (mLooper == null) {
-        throw new RuntimeException(
-            &quot;Can&apos;t create handler inside thread that has not called Looper.prepare()&quot;);
-    }
-    mQueue = mLooper.mQueue;
-    mCallback = callback;
-    mAsynchronous = async;
-}
-</code></pre><p>可以看到其实当我们在new一个handler的时候，它里面进行了一个很重要的操作：<br>mLooper = Looper.myLooper();我们最重要的Looper入场了,Looper.myLooper()方法获取了一个Looper对象，如果Looper对象为空，则会抛出一个运行时异常，所以想要一探究尽，我们得去看看这个Looper这个类，到底扮演着什么角色。</p>
+<h2 id="一-Handler"><a href="#一-Handler" class="headerlink" title="一.Handler"></a>一.Handler</h2><p>我们平时在开发的过程中都会选择直接去new一个Handler,如下代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Handler mHandler=<span class="keyword">new</span> Handler(<span class="keyword">new</span> Handler.Callback() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p> 然后在线程中通过Message来组装需要传递到ui线程的数据，让handler来进行发送，代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//发送消息</span></span><br><span class="line">        Message msg = Message.obtain();</span><br><span class="line">        msg.what = <span class="number">111</span>;</span><br><span class="line">        Bundle bundle=<span class="keyword">new</span> Bundle();</span><br><span class="line">        bundle.putString(<span class="string">"huan"</span>,<span class="string">"hello"</span>);</span><br><span class="line">        msg.setData(bundle);</span><br><span class="line">        mHandler.sendMessage(msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;).start();</span><br></pre></td></tr></table></figure></p>
+<p>这样就可以在主线程的handler回调callback中接收到这个消息并进行处理：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(msg.what==<span class="number">111</span>)&#123;</span><br><span class="line">        <span class="comment">//取出数据</span></span><br><span class="line">        String str = msg.getData().getString(<span class="string">"huan"</span>);</span><br><span class="line">        <span class="comment">//...进行ui更新</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样一套基本的异步更新ui的流程就走完了。但是当写完这些代码的时候有没有想过为什么这样子做可以实现？表面上看我们紧紧就是new 了一个handler和一个messsage作为载体就达到了这样的效果，但是实际底层的实现却比这复杂的多。下面我们可以一起进入源码来看看到底里面是如何实现的。<br>先来看看handler的构造方法：<br>我们平时只实现了callback这一个参数，点进去一看发现其实是：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Handler</span><span class="params">(Callback callback)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>(callback, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面的 才是最终的一个实现：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Handler</span><span class="params">(Callback callback, <span class="keyword">boolean</span> async)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (FIND_POTENTIAL_LEAKS) &#123;</span><br><span class="line">        <span class="keyword">final</span> Class&lt;? extends Handler&gt; klass = getClass();</span><br><span class="line">        <span class="keyword">if</span> ((klass.isAnonymousClass() || klass.isMemberClass() || klass.isLocalClass()) &amp;&amp;</span><br><span class="line">                (klass.getModifiers() &amp; Modifier.STATIC) == <span class="number">0</span>) &#123;</span><br><span class="line">            Log.w(TAG, <span class="string">"The following Handler class should be static or leaks might occur: "</span> +</span><br><span class="line">                klass.getCanonicalName());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mLooper = Looper.myLooper();</span><br><span class="line">    <span class="keyword">if</span> (mLooper == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">            <span class="string">"Can't create handler inside thread that has not called Looper.prepare()"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    mQueue = mLooper.mQueue;</span><br><span class="line">    mCallback = callback;</span><br><span class="line">    mAsynchronous = async;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到其实当我们在new一个handler的时候，它里面进行了一个很重要的操作：<br>mLooper = Looper.myLooper();我们最重要的Looper入场了,Looper.myLooper()方法获取了一个Looper对象，如果Looper对象为空，则会抛出一个运行时异常，所以想要一探究尽，我们得去看看这个Looper这个类，到底扮演着什么角色。</p>
 <h2 id="二-Looper"><a href="#二-Looper" class="headerlink" title="二.Looper"></a>二.Looper</h2><p>(备注：至于Looper这个类到底有什么用，这里先不做解释，我们先跟着源码一步一步走下就会揭开它的面纱)</p>
-<p>当进入到Looper这个类的时候，查看myLooper()这个方法时发现就紧紧一行代码：</p>
-<pre><code>public static Looper myLooper() {
-    return sThreadLocal.get();
-}
-</code></pre><p>通过sThreadLocal这个对象来获取到looper，那既然是通过get方法来获取到这个looper，那必然有set方法来设置这个looper，但是我们自己只是new了一个handler，并没有对looper做任何的处理和操作，那必然是android系统自己在某个地方给我们做了某些操作，接下来继续深入查看Looper这个类，看看sThreadLocal这个对象到底是在哪儿进行申明的：</p>
-<pre><code>public final class Looper {
-    private static final String TAG = &quot;Looper&quot;;
-
-    // sThreadLocal.get() will return null unless you&apos;ve called prepare().
-    static final ThreadLocal&lt;Looper&gt; sThreadLocal = new ThreadLocal&lt;Looper&gt;();
-</code></pre><p>一查找发现，居然在类的开头进行了这个对象的初始化，并且给出了明确的注释：如果没有执行Looper的prepare()方法那么通过sThreadLocal.get()返回的就是null。所以，现在目的就明确了，跟着指示走下去看看prepare()方法里面到底执行了什么操作：</p>
-<pre><code>public static void prepare() {
-    prepare(true);
-}
-
-private static void prepare(boolean quitAllowed) {
-    if (sThreadLocal.get() != null) {
-        throw new RuntimeException(&quot;Only one Looper may be created per thread&quot;);
-    }
-    sThreadLocal.set(new Looper(quitAllowed));
-}
-</code></pre><p>很明显的看到，原来是在prepare()方法中对sThreadLocal设置了一个新的looper,并且这里也进行了一个非空判断，如果已经执行过prepare来获取过一次looper，那么再次调用的时候就会抛出异常，这样的做法也是保证了一个线程中只有一个Looper的实例。<br>(备注下：sThreadLocal是一个ThreadLocal对象，可以在一个线程中存储变量T)</p>
+<p>当进入到Looper这个类的时候，查看myLooper()这个方法时发现就紧紧一行代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Looper <span class="title">myLooper</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> sThreadLocal.get();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过sThreadLocal这个对象来获取到looper，那既然是通过get方法来获取到这个looper，那必然有set方法来设置这个looper，但是我们自己只是new了一个handler，并没有对looper做任何的处理和操作，那必然是android系统自己在某个地方给我们做了某些操作，接下来继续深入查看Looper这个类，看看sThreadLocal这个对象到底是在哪儿进行申明的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Looper</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"Looper"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// sThreadLocal.get() will return null unless you've called prepare().</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Looper&gt; sThreadLocal = <span class="keyword">new</span> ThreadLocal&lt;Looper&gt;();</span><br></pre></td></tr></table></figure></p>
+<p>一查找发现，居然在类的开头进行了这个对象的初始化，并且给出了明确的注释：如果没有执行Looper的prepare()方法那么通过sThreadLocal.get()返回的就是null。所以，现在目的就明确了，跟着指示走下去看看prepare()方法里面到底执行了什么操作：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">prepare</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    prepare(<span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">prepare</span><span class="params">(<span class="keyword">boolean</span> quitAllowed)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (sThreadLocal.get() != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Only one Looper may be created per thread"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    sThreadLocal.set(<span class="keyword">new</span> Looper(quitAllowed));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>很明显的看到，原来是在prepare()方法中对sThreadLocal设置了一个新的looper,并且这里也进行了一个非空判断，如果已经执行过prepare来获取过一次looper，那么再次调用的时候就会抛出异常，这样的做法也是保证了一个线程中只有一个Looper的实例。<br>(备注下：sThreadLocal是一个ThreadLocal对象，可以在一个线程中存储变量T)</p>
 <p>看到这里可能大家可能都会觉得很明了，清晰了，我们整理下整个思路流程就是：</p>
 <ol>
 <li>new一个handle来作为发送消息的载体</li>
@@ -297,219 +230,38 @@ private static void prepare(boolean quitAllowed) {
 <li>想要通过sThreadLocal这个对象来获取到looper，必须先执行Looper的prepare()方法</li>
 </ol>
 <p>那么问题来了：<br>之前我们不是在new一个handler对象的时候，发现其实构造函数里面就是通过Looper.myLooper()方法来获取了一个looper，但是如果Looper对象为空，则会抛出一个运行时异常；并且我们至始至终都没用使用过这个looper对象，更不用说执行它的prepare方法了，那么为什么我们这样任性的使用handler，程序确没有奔溃？</p>
-<p>一开始我就发现了这个细节，而且我们在new handler的时候大部分的时候都是在主线程中去操作的，那么猜想必然是android系统在应用程序启动的时候，开启主线程的时候就为这个线程创建了这了Looper对象，提前为我们执行了Looper.prepare()方法。<br>这个时候你也不用特意去研究android系统启动的过程就能很轻松的找到在Looper类的prepare()方法下面就是一个prepareMainLooper()函数</p>
-<pre><code>/**
- * Initialize the current thread as a looper, marking it as an
- * application&apos;s main looper. The main looper for your application
- * is created by the Android environment, so you should never need
- * to call this function yourself.  See also: {@link #prepare()}
- */
-public static void prepareMainLooper() {
-    prepare(false);
-    synchronized (Looper.class) {
-        if (sMainLooper != null) {
-            throw new IllegalStateException(&quot;The main Looper has already been prepared.&quot;);
-        }
-        sMainLooper = myLooper();
-    }
-}
-</code></pre><p>而且注释给的很详细了：在当前线程中初始化了一个Looper，并且作为我们应用程序的main looper，在我们应用程序创建的时候就会创建，所以不需要我们去手动的去调用这个方法。</p>
-<p>查看源代码发现果然是这样的：在ActivityThread的main方法中</p>
-<pre><code>public static final void main(String[] args) {      
-       ......    
-
-       Looper.prepareMainLooper();      
-
-       ......      
-
-       ActivityThread thread = new ActivityThread();      
-       thread.attach(false);      
-
-       ......     
-       Looper.loop();      
-
-       ......     
-
-       thread.detach();      
-       ......      
-   }    
-</code></pre><p>这里小结下：我们应用程序在启动的时候会给我们创建一个main looper，并始终存在我们应用程序，所以不需要我们手动去调用Looper.prepare()方法，所以在主线程中的任意地方你都可以放肆的创建Handler，但是注意：如果是在子线程中创建Handler，<br>务必先调用Looper.prepare()才能创建Handler对象。</p>
+<p>一开始我就发现了这个细节，而且我们在new handler的时候大部分的时候都是在主线程中去操作的，那么猜想必然是android系统在应用程序启动的时候，开启主线程的时候就为这个线程创建了这了Looper对象，提前为我们执行了Looper.prepare()方法。<br>这个时候你也不用特意去研究android系统启动的过程就能很轻松的找到在Looper类的prepare()方法下面就是一个prepareMainLooper()函数<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Initialize the current thread as a looper, marking it as an</span><br><span class="line"> * application's main looper. The main looper for your application</span><br><span class="line"> * is created by the Android environment, so you should never need</span><br><span class="line"> * to call this function yourself.  See also: &#123;<span class="doctag">@link</span> #prepare()&#125;</span><br><span class="line"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">prepareMainLooper</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    prepare(<span class="keyword">false</span>);</span><br><span class="line">    <span class="keyword">synchronized</span> (Looper.class) &#123;</span><br><span class="line">        <span class="keyword">if</span> (sMainLooper != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"The main Looper has already been prepared."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        sMainLooper = myLooper();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>而且注释给的很详细了：在当前线程中初始化了一个Looper，并且作为我们应用程序的main looper，在我们应用程序创建的时候就会创建，所以不需要我们去手动的去调用这个方法。</p>
+<p>查看源代码发现果然是这样的：在ActivityThread的main方法中<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;      </span><br><span class="line">       ......    </span><br><span class="line">     </span><br><span class="line">       Looper.prepareMainLooper();      </span><br><span class="line">            </span><br><span class="line">       ......      </span><br><span class="line">     </span><br><span class="line">       ActivityThread thread = <span class="keyword">new</span> ActivityThread();      </span><br><span class="line">       thread.attach(<span class="keyword">false</span>);      </span><br><span class="line">     </span><br><span class="line">       ......     </span><br><span class="line">       Looper.loop();      </span><br><span class="line">     </span><br><span class="line">       ......     </span><br><span class="line">     </span><br><span class="line">       thread.detach();      </span><br><span class="line">       ......      </span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里小结下：我们应用程序在启动的时候会给我们创建一个main looper，并始终存在我们应用程序，所以不需要我们手动去调用Looper.prepare()方法，所以在主线程中的任意地方你都可以放肆的创建Handler，但是注意：如果是在子线程中创建Handler，<br>务必先调用Looper.prepare()才能创建Handler对象。</p>
 <p>备注：在ActivityThread中不仅实现了Looper.prepareMainLooper()方法我们还看到有个Looper.loop()方法，这个方法有什么用，先不着急了解，我们留个伏笔。</p>
-<h2 id="三-消息循环"><a href="#三-消息循环" class="headerlink" title="三.消息循环"></a>三.消息循环</h2><p>上面讲了hanlder创建的整个过程，以及如何得到looper的过程，但是始终还是不知道这个looper到底有什么用，是如何操作的？接下来回到我们之前的步骤中接着走下去，在sThreadLocal中设置了一个new Looper(),可以进入Looper的构造函数看看到底实现了什么：</p>
-<pre><code>private Looper(boolean quitAllowed) {
-    mQueue = new MessageQueue(quitAllowed);
-    mThread = Thread.currentThread();
-}
-</code></pre><p>这里new出了一个MessageQueue对象，也就是我们另一个角色扮演者：消息队列。所有通过handler发送的消息都会存储到这个消息队列来，因此一个Looper对象对应了一个MessageQueue。而在handler的构造函数中我们看到了：mQueue = mLooper.mQueue 也就是说Handler中的消息队列变量最终都会指向Looper的消息队列。</p>
-<p>那就不难理解为什么我们通过</p>
-<pre><code>mHandler.sendMessage(msg);
-</code></pre><p>这个代码就能将消息发送到Looper的消息队列中来，handler也为我们提供了一系列函数来帮助完成创建消息和插入消息队列的工作：</p>
+<h2 id="三-消息循环"><a href="#三-消息循环" class="headerlink" title="三.消息循环"></a>三.消息循环</h2><p>上面讲了hanlder创建的整个过程，以及如何得到looper的过程，但是始终还是不知道这个looper到底有什么用，是如何操作的？接下来回到我们之前的步骤中接着走下去，在sThreadLocal中设置了一个new Looper(),可以进入Looper的构造函数看看到底实现了什么：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="title">Looper</span><span class="params">(<span class="keyword">boolean</span> quitAllowed)</span> </span>&#123;</span><br><span class="line">    mQueue = <span class="keyword">new</span> MessageQueue(quitAllowed);</span><br><span class="line">    mThread = Thread.currentThread();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里new出了一个MessageQueue对象，也就是我们另一个角色扮演者：消息队列。所有通过handler发送的消息都会存储到这个消息队列来，因此一个Looper对象对应了一个MessageQueue。而在handler的构造函数中我们看到了：mQueue = mLooper.mQueue 也就是说Handler中的消息队列变量最终都会指向Looper的消息队列。</p>
+<p>那就不难理解为什么我们通过<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mHandler.sendMessage(msg);</span><br></pre></td></tr></table></figure></p>
+<p>这个代码就能将消息发送到Looper的消息队列中来，handler也为我们提供了一系列函数来帮助完成创建消息和插入消息队列的工作：</p>
 <ul>
 <li><p>从handler中创建一个消息码是what的消息</p>
-<p>  public final Message obtainMessage(int what)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Message <span class="title">obtainMessage</span><span class="params">(<span class="keyword">int</span> what)</span></span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>发送一个只含有消息码的消息</p>
-<p>  public final boolean sendEmptyMessage(int what)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">sendEmptyMessage</span><span class="params">(<span class="keyword">int</span> what)</span></span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>延时发送一个只含有消息码的消息</p>
-<p>  public final boolean sendEmptyMessageDelayed(int what, long delayMillis)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">sendEmptyMessageDelayed</span><span class="params">(<span class="keyword">int</span> what, <span class="keyword">long</span> delayMillis)</span></span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>发送一个消息，默认添加至队列尾</p>
-<p>  public final boolean sendMessage(Message msg)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">sendMessage</span><span class="params">(Message msg)</span></span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>发送一个消息，添加至队列头，优先级高</p>
-<p>  public final boolean sendMessageAtFrontOfQueue(Message msg)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">sendMessageAtFrontOfQueue</span><span class="params">(Message msg)</span></span></span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<p>接下来再进入sendMessage中看看如何操作的就明了了：</p>
-<pre><code>public final boolean sendMessage(Message msg)
-{
-    return sendMessageDelayed(msg, 0);
-}
-
-public final boolean sendMessageDelayed(Message msg, long delayMillis)
-{
-    if (delayMillis &lt; 0) {
-        delayMillis = 0;
-    }
-    return sendMessageAtTime(msg, SystemClock.uptimeMillis() + delayMillis);
-}
-
-public boolean sendMessageAtTime(Message msg, long uptimeMillis) {
-    MessageQueue queue = mQueue;
-    if (queue == null) {
-        RuntimeException e = new RuntimeException(
-                this + &quot; sendMessageAtTime() called with no mQueue&quot;);
-        Log.w(&quot;Looper&quot;, e.getMessage(), e);
-        return false;
-    }
-    return enqueueMessage(queue, msg, uptimeMillis);
-}
-</code></pre><p>最后调用的是sendMessageAtTime这个方法，也就是拿到之前的MessageQueue然后进行了enqueueMessage操作：</p>
-<pre><code>private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMillis) {
-    msg.target = this;
-    if (mAsynchronous) {
-        msg.setAsynchronous(true);
-    }
-    return queue.enqueueMessage(msg, uptimeMillis);
-}
-</code></pre><p>这里将msg的target指向了自己，也就是handler，然后又调用了queue.enqueueMessage(msg, uptimeMillis)<br>进去看看：</p>
-<pre><code>boolean enqueueMessage(Message msg, long when) {
-    if (msg.target == null) {
-        throw new IllegalArgumentException(&quot;Message must have a target.&quot;);
-    }
-    if (msg.isInUse()) {
-        throw new IllegalStateException(msg + &quot; This message is already in use.&quot;);
-    }
-
-    synchronized (this) {
-        if (mQuitting) {
-            IllegalStateException e = new IllegalStateException(
-                    msg.target + &quot; sending message to a Handler on a dead thread&quot;);
-            Log.w(&quot;MessageQueue&quot;, e.getMessage(), e);
-            msg.recycle();
-            return false;
-        }
-
-        msg.markInUse();
-        msg.when = when;
-        Message p = mMessages;
-        boolean needWake;
-        if (p == null || when == 0 || when &lt; p.when) {
-            // New head, wake up the event queue if blocked.
-            msg.next = p;
-            mMessages = msg;
-            needWake = mBlocked;
-        } else {
-            // Inserted within the middle of the queue.  Usually we don&apos;t have to wake
-            // up the event queue unless there is a barrier at the head of the queue
-            // and the message is the earliest asynchronous message in the queue.
-            needWake = mBlocked &amp;&amp; p.target == null &amp;&amp; msg.isAsynchronous();
-            Message prev;
-            for (;;) {
-                prev = p;
-                p = p.next;
-                if (p == null || when &lt; p.when) {
-                    break;
-                }
-                if (needWake &amp;&amp; p.isAsynchronous()) {
-                    needWake = false;
-                }
-            }
-            msg.next = p; // invariant: p == prev.next
-            prev.next = msg;
-        }
-
-        // We can assume mPtr != 0 because mQuitting is false.
-        if (needWake) {
-            nativeWake(mPtr);
-        }
-    }
-    return true;
-}
-</code></pre><p>大致分析了下，这里主要就是将消息进行了一个时间排序，根据我们传入的uptimeMillis.根据时间的顺序调用msg.next.<br>消息进入队列已经完成，那么在什么时候进入处理消息，循环消息，就是我们之前埋下的伏笔：在ActivityThread中不仅实现了Looper.prepareMainLooper()方法我们还看到有个Looper.loop()方法</p>
-<pre><code>public static void loop() {
-    final Looper me = myLooper();
-    if (me == null) {
-        throw new RuntimeException(&quot;No Looper; Looper.prepare() wasn&apos;t called on this thread.&quot;);
-    }
-    final MessageQueue queue = me.mQueue;
-
-    // Make sure the identity of this thread is that of the local process,
-    // and keep track of what that identity token actually is.
-    Binder.clearCallingIdentity();
-    final long ident = Binder.clearCallingIdentity();
-
-    for (;;) {
-        Message msg = queue.next(); // might block
-        if (msg == null) {
-            // No message indicates that the message queue is quitting.
-            return;
-        }
-
-        // This must be in a local variable, in case a UI event sets the logger
-        Printer logging = me.mLogging;
-        if (logging != null) {
-            logging.println(&quot;&gt;&gt;&gt;&gt;&gt; Dispatching to &quot; + msg.target + &quot; &quot; +
-                    msg.callback + &quot;: &quot; + msg.what);
-        }
-
-        msg.target.dispatchMessage(msg);
-
-        if (logging != null) {
-            logging.println(&quot;&lt;&lt;&lt;&lt;&lt; Finished to &quot; + msg.target + &quot; &quot; + msg.callback);
-        }
-
-        // Make sure that during the course of dispatching the
-        // identity of the thread wasn&apos;t corrupted.
-        final long newIdent = Binder.clearCallingIdentity();
-        if (ident != newIdent) {
-            Log.wtf(TAG, &quot;Thread identity changed from 0x&quot;
-                    + Long.toHexString(ident) + &quot; to 0x&quot;
-                    + Long.toHexString(newIdent) + &quot; while dispatching to &quot;
-                    + msg.target.getClass().getName() + &quot; &quot;
-                    + msg.callback + &quot; what=&quot; + msg.what);
-        }
-
-        msg.recycleUnchecked();
-    }
-}
-</code></pre><p>我们有时看源码的时候，没必要每一行都去理解它，抓重点就行：这个函数主要创建了一个死循环，不断的调用Message msg = queue.next();来从消息队列里面取出消息，并进行处理：msg.target.dispatchMessage(msg)   ，而msg.target刚好是我们之前看handler的时候把自己赋值给了这个target；接下来继续看看这个target做了什么事：</p>
-<pre><code>msg.target.dispatchMessage(msg);
-
-public void dispatchMessage(Message msg) {
-    if (msg.callback != null) {
-        handleCallback(msg);
-    } else {
-        if (mCallback != null) {
-            if (mCallback.handleMessage(msg)) {
-                return;
-            }
-        }
-        handleMessage(msg);
-    }
-}
-</code></pre><p>在dispatchMessage方法中可以看到如果消息本身有callback，则直接交给msg的callback处理，否则mCallback不为null就会执行mCallback.handleMessage(msg);看到这儿相信大家已经豁然开朗了，这从我们刚开始讲的实现callback的handleMessage方法相对应，也就是说消息是从这里传递过去的。这样我们从开头到这儿刚好形成一个逻辑的闭环。一个消息链的发送和接收处理的完整过程我们再进行总结下：</p>
+<p>接下来再进入sendMessage中看看如何操作的就明了了：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">sendMessage</span><span class="params">(Message msg)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> sendMessageDelayed(msg, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">sendMessageDelayed</span><span class="params">(Message msg, <span class="keyword">long</span> delayMillis)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (delayMillis &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        delayMillis = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> sendMessageAtTime(msg, SystemClock.uptimeMillis() + delayMillis);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">sendMessageAtTime</span><span class="params">(Message msg, <span class="keyword">long</span> uptimeMillis)</span> </span>&#123;</span><br><span class="line">    MessageQueue queue = mQueue;</span><br><span class="line">    <span class="keyword">if</span> (queue == <span class="keyword">null</span>) &#123;</span><br><span class="line">        RuntimeException e = <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                <span class="keyword">this</span> + <span class="string">" sendMessageAtTime() called with no mQueue"</span>);</span><br><span class="line">        Log.w(<span class="string">"Looper"</span>, e.getMessage(), e);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> enqueueMessage(queue, msg, uptimeMillis);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后调用的是sendMessageAtTime这个方法，也就是拿到之前的MessageQueue然后进行了enqueueMessage操作：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">enqueueMessage</span><span class="params">(MessageQueue queue, Message msg, <span class="keyword">long</span> uptimeMillis)</span> </span>&#123;</span><br><span class="line">    msg.target = <span class="keyword">this</span>;</span><br><span class="line">    <span class="keyword">if</span> (mAsynchronous) &#123;</span><br><span class="line">        msg.setAsynchronous(<span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> queue.enqueueMessage(msg, uptimeMillis);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里将msg的target指向了自己，也就是handler，然后又调用了queue.enqueueMessage(msg, uptimeMillis)<br>进去看看：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">enqueueMessage</span><span class="params">(Message msg, <span class="keyword">long</span> when)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (msg.target == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Message must have a target."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (msg.isInUse()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(msg + <span class="string">" This message is already in use."</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (mQuitting) &#123;</span><br><span class="line">            IllegalStateException e = <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">                    msg.target + <span class="string">" sending message to a Handler on a dead thread"</span>);</span><br><span class="line">            Log.w(<span class="string">"MessageQueue"</span>, e.getMessage(), e);</span><br><span class="line">            msg.recycle();</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        msg.markInUse();</span><br><span class="line">        msg.when = when;</span><br><span class="line">        Message p = mMessages;</span><br><span class="line">        <span class="keyword">boolean</span> needWake;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> || when == <span class="number">0</span> || when &lt; p.when) &#123;</span><br><span class="line">            <span class="comment">// New head, wake up the event queue if blocked.</span></span><br><span class="line">            msg.next = p;</span><br><span class="line">            mMessages = msg;</span><br><span class="line">            needWake = mBlocked;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Inserted within the middle of the queue.  Usually we don't have to wake</span></span><br><span class="line">            <span class="comment">// up the event queue unless there is a barrier at the head of the queue</span></span><br><span class="line">            <span class="comment">// and the message is the earliest asynchronous message in the queue.</span></span><br><span class="line">            needWake = mBlocked &amp;&amp; p.target == <span class="keyword">null</span> &amp;&amp; msg.isAsynchronous();</span><br><span class="line">            Message prev;</span><br><span class="line">            <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">                prev = p;</span><br><span class="line">                p = p.next;</span><br><span class="line">                <span class="keyword">if</span> (p == <span class="keyword">null</span> || when &lt; p.when) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (needWake &amp;&amp; p.isAsynchronous()) &#123;</span><br><span class="line">                    needWake = <span class="keyword">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            msg.next = p; <span class="comment">// invariant: p == prev.next</span></span><br><span class="line">            prev.next = msg;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// We can assume mPtr != 0 because mQuitting is false.</span></span><br><span class="line">        <span class="keyword">if</span> (needWake) &#123;</span><br><span class="line">            nativeWake(mPtr);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>大致分析了下，这里主要就是将消息进行了一个时间排序，根据我们传入的uptimeMillis.根据时间的顺序调用msg.next.<br>消息进入队列已经完成，那么在什么时候进入处理消息，循环消息，就是我们之前埋下的伏笔：在ActivityThread中不仅实现了Looper.prepareMainLooper()方法我们还看到有个Looper.loop()方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">loop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Looper me = myLooper();</span><br><span class="line">    <span class="keyword">if</span> (me == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"No Looper; Looper.prepare() wasn't called on this thread."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> MessageQueue queue = me.mQueue;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Make sure the identity of this thread is that of the local process,</span></span><br><span class="line">    <span class="comment">// and keep track of what that identity token actually is.</span></span><br><span class="line">    Binder.clearCallingIdentity();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> ident = Binder.clearCallingIdentity();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        Message msg = queue.next(); <span class="comment">// might block</span></span><br><span class="line">        <span class="keyword">if</span> (msg == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// No message indicates that the message queue is quitting.</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// This must be in a local variable, in case a UI event sets the logger</span></span><br><span class="line">        Printer logging = me.mLogging;</span><br><span class="line">        <span class="keyword">if</span> (logging != <span class="keyword">null</span>) &#123;</span><br><span class="line">            logging.println(<span class="string">"&gt;&gt;&gt;&gt;&gt; Dispatching to "</span> + msg.target + <span class="string">" "</span> +</span><br><span class="line">                    msg.callback + <span class="string">": "</span> + msg.what);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        msg.target.dispatchMessage(msg);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (logging != <span class="keyword">null</span>) &#123;</span><br><span class="line">            logging.println(<span class="string">"&lt;&lt;&lt;&lt;&lt; Finished to "</span> + msg.target + <span class="string">" "</span> + msg.callback);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Make sure that during the course of dispatching the</span></span><br><span class="line">        <span class="comment">// identity of the thread wasn't corrupted.</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">long</span> newIdent = Binder.clearCallingIdentity();</span><br><span class="line">        <span class="keyword">if</span> (ident != newIdent) &#123;</span><br><span class="line">            Log.wtf(TAG, <span class="string">"Thread identity changed from 0x"</span></span><br><span class="line">                    + Long.toHexString(ident) + <span class="string">" to 0x"</span></span><br><span class="line">                    + Long.toHexString(newIdent) + <span class="string">" while dispatching to "</span></span><br><span class="line">                    + msg.target.getClass().getName() + <span class="string">" "</span></span><br><span class="line">                    + msg.callback + <span class="string">" what="</span> + msg.what);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        msg.recycleUnchecked();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们有时看源码的时候，没必要每一行都去理解它，抓重点就行：这个函数主要创建了一个死循环，不断的调用Message msg = queue.next();来从消息队列里面取出消息，并进行处理：msg.target.dispatchMessage(msg)   ，而msg.target刚好是我们之前看handler的时候把自己赋值给了这个target；接下来继续看看这个target做了什么事：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">msg.target.dispatchMessage(msg);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dispatchMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (msg.callback != <span class="keyword">null</span>) &#123;</span><br><span class="line">        handleCallback(msg);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (mCallback != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mCallback.handleMessage(msg)) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        handleMessage(msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在dispatchMessage方法中可以看到如果消息本身有callback，则直接交给msg的callback处理，否则mCallback不为null就会执行mCallback.handleMessage(msg);看到这儿相信大家已经豁然开朗了，这从我们刚开始讲的实现callback的handleMessage方法相对应，也就是说消息是从这里传递过去的。这样我们从开头到这儿刚好形成一个逻辑的闭环。一个消息链的发送和接收处理的完整过程我们再进行总结下：</p>
 <ol>
 <li><p>无论是在android 应用程序主线程还是其他线程首先会执行Looper.prepare()，创建该线程的Looper对象，记住：一个线程对应一个Looper对象；然后在创建Looper的时候创建了一个MessagQueue消息队列管理消息的入栈和出栈，也是一个线程对应一个MessagQueue；</p>
 </li>

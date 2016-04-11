@@ -16,7 +16,7 @@
 <meta property="og:description" content="在网上看到一篇文章对touch mode的介绍是这样的：
 
 大多数Android设备都是触摸屏的，但是实际上Android设备也支持键盘操作，允许通过键盘来完成导航，点击，输入等。当用户通过键盘（或者轨迹球）操作的时候，有必要聚焦当前接受输入的UI元素，例如，高亮（聚焦）某个按钮，让用户知道当前正在操作的UI元素是哪个。但是，当用户使用触摸屏与设备交互的时候，始终聚焦当前UI元素就没有必要了，而且">
-<meta property="og:updated_time" content="2016-04-10T04:52:11.796Z">
+<meta property="og:updated_time" content="2016-04-11T09:12:45.746Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="EditText自动聚焦-FocusableInTouchMode">
 <meta name="twitter:description" content="在网上看到一篇文章对touch mode的介绍是这样的：
@@ -210,19 +210,7 @@
 <blockquote>
 <p>大多数Android设备都是触摸屏的，但是实际上Android设备也支持键盘操作，允许通过键盘来完成导航，点击，输入等。<br>当用户通过键盘（或者轨迹球）操作的时候，有必要聚焦当前接受输入的UI元素，例如，高亮（聚焦）某个按钮，让用户知道当前正在操作的UI元素是哪个。<br>但是，当用户使用触摸屏与设备交互的时候，始终聚焦当前UI元素就没有必要了，而且很丑陋；用户点击哪个元素，哪个元素就是当前元素，无需高亮标识。并且，通过触摸屏与设备交互的时候，点击某个UI元素也不会导致该元素聚焦，此时的高亮效果是由Pressed状态来完成的。也就是说，在Touch Mode模式之下，UI元素是不会进入聚焦状态的，即使调用requestFocus也不会。<br>那么，Android是如何区分这两种情况的呢？<br>答案就是Touch Mode。当用户开始通过键盘与设备交互的时候，设备就退出Touch Mode模式；当用户开始通过触摸屏与设备交互的时候，设备就进入Touch Mode模式。可以通过调用View的isInTouchMode来判断设备当前是否处于Touch Mode模式。<br>但是，也有例外情况。有些UI元素，即使是在Touch Mode的状态之下，也需要获得焦点，典型的就是Edittext。那么，这种情况该如何处理呢？<br>答案就是做特殊处理。Android规定，某些元素，即使是在Touch Mode模式下，也可以获得焦点。调用View的setFocusableInTouchMode(true)可以使View在Touch Mode模式之下仍然可获得焦点（像Edittext就是在内部设置了这个属性），调用isFocusableInTouchMode可以判断View是否可在Touch Mode模式下聚焦。<br><a id="more"></a><br>所以看完介绍后我们知道了edittext这个控件的特殊作用。<br>在某些应用场景下，如果我们使用到了EditText这个控件，在我们进入这个界面的时候并不希望这个edittext让键盘弹起来的时候，我们可以让包裹这个edittext控件的父控件获得聚焦，即：给父控件设置android:focusableInTouchMode=“true”，即可避免键盘的自动弹出。<br>代码如下:</p>
 </blockquote>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
-    android:orientation=&quot;vertical&quot; android:layout_width=&quot;match_parent&quot;
-    android:layout_height=&quot;match_parent&quot;
-    android:focusableInTouchMode=&quot;true&quot;
-    &gt;
-
-    &lt;EditText
-        android:layout_width=&quot;match_parent&quot;
-        android:layout_height=&quot;wrap_content&quot; /&gt;
-
-&lt;/LinearLayout&gt;
-</code></pre>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line">&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"</span><br><span class="line">    android:orientation="vertical" android:layout_width="match_parent"</span><br><span class="line">    android:layout_height="match_parent"</span><br><span class="line">    android:focusableInTouchMode="true"</span><br><span class="line">    &gt;</span><br><span class="line"></span><br><span class="line">    &lt;EditText</span><br><span class="line">        android:layout_width="match_parent"</span><br><span class="line">        android:layout_height="wrap_content" /&gt;</span><br><span class="line"></span><br><span class="line">&lt;/LinearLayout&gt;</span><br></pre></td></tr></table></figure>
       
     </div>
     

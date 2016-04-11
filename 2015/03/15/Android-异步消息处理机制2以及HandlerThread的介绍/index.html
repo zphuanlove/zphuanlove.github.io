@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Peihuan Develop">
 <meta property="og:description" content="之间在上篇文章中介绍过了Android的异步消息处理机制，这里再进行一些补充，说下多线程中的消息处理以及HandlerThread的介绍，如果你还不是很了解handler的机制，可以先看看上篇文章Android-异步消息处理机制(Handler,Looper,Message)
 在上篇文章中开头说过我们平时在子线程中去更新ui的操作一般是通过handler来发送message的方式进行处理，但是其实">
-<meta property="og:updated_time" content="2016-04-10T04:45:32.023Z">
+<meta property="og:updated_time" content="2016-04-11T09:10:03.109Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android-异步消息处理机制2以及HandlerThread的介绍">
 <meta name="twitter:description" content="之间在上篇文章中介绍过了Android的异步消息处理机制，这里再进行一些补充，说下多线程中的消息处理以及HandlerThread的介绍，如果你还不是很了解handler的机制，可以先看看上篇文章Android-异步消息处理机制(Handler,Looper,Message)
@@ -208,102 +208,26 @@
 <ol>
 <li>Handler的post()方法</li>
 <li>View的post()方法</li>
-<li><p>Activity的runOnUiThread()方法<br>代码如下：</p>
-<a id="more"></a>
-<p> new Thread(new Runnable() {</p>
-<pre><code>@Override
-public void run() {
-    //1.普遍的方式
-    //发送消息
-    Message msg = Message.obtain();
-    msg.what = 111;
-    Bundle bundle=new Bundle();
-    bundle.putString(&quot;huan&quot;,&quot;hello&quot;);
-    msg.setData(bundle);
-    mHandler.sendMessage(msg);
-
-    //2.post的方式
-    mHandler.post(new Runnable() {
-        @Override
-        public void run() {
-            //可以直接在这儿进行ui的更新
-        }
-    });
-
-    //3.view.post方式
-    mTvHelloWord.post(new Runnable() {
-        @Override
-        public void run() {
-            //可以直接在这儿进行ui的更新
-        }
-    });
-
-    //4.runOnUiThread方式
-    runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-            //可以直接在这儿进行ui的更新
-        }
-    });
-}
-</code></pre><p> }).start();</p>
+<li>Activity的runOnUiThread()方法<br>代码如下：<a id="more"></a>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//1.普遍的方式</span></span><br><span class="line">        <span class="comment">//发送消息</span></span><br><span class="line">        Message msg = Message.obtain();</span><br><span class="line">        msg.what = <span class="number">111</span>;</span><br><span class="line">        Bundle bundle=<span class="keyword">new</span> Bundle();</span><br><span class="line">        bundle.putString(<span class="string">"huan"</span>,<span class="string">"hello"</span>);</span><br><span class="line">        msg.setData(bundle);</span><br><span class="line">        mHandler.sendMessage(msg);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2.post的方式</span></span><br><span class="line">        mHandler.post(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="comment">//可以直接在这儿进行ui的更新</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3.view.post方式</span></span><br><span class="line">        mTvHelloWord.post(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="comment">//可以直接在这儿进行ui的更新</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//4.runOnUiThread方式</span></span><br><span class="line">        runOnUiThread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="comment">//可以直接在这儿进行ui的更新</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;).start();</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
 <p>从代码中可以明显的看出，后面三种方式要简便的多，而且是一种比一种简便，都不需要通过Message 的创建去封装消息；第二种方式还需要使用handler作为载体，第三种方式需要使用view来作为载体，第四种方式直接用runOnUiThread方法即可。为什么可以这样写也能达到目的？进去看看知道了。</p>
 <ol>
-<li><p>先说下handler post方式的使用，我们不需要再去创建一个Message对象，把数据封装在Message中，然后在handler的callback中进行ui的操作，而是直接可以在run中进行操作。进入到post方法中：</p>
-<p> public final boolean post(Runnable r)<br> {</p>
-<pre><code>return  sendMessageDelayed(getPostMessage(r), 0);
-</code></pre><p> }</p>
+<li>先说下handler post方式的使用，我们不需要再去创建一个Message对象，把数据封装在Message中，然后在handler的callback中进行ui的操作，而是直接可以在run中进行操作。进入到post方法中：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">post</span><span class="params">(Runnable r)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">   <span class="keyword">return</span>  sendMessageDelayed(getPostMessage(r), <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
-<p>所噶，原来还是通过sendMessageDelayed(Message msg, long delayMillis)这个方法来进行操作的，并且将我们传入的runnable对象通过getPostMessage方法转为了一个Message;那我们再进入getPostMessage方法中一看应该就能明了了：</p>
-<pre><code>private static Message getPostMessage(Runnable r) {
-    Message m = Message.obtain();
-    m.callback = r;
-    return m;
-}
-</code></pre><p>创建了一个消息，并把这个消息的callback设置为了我们传入的runnnable；还记得我们上篇文章说过的在Looper进行消息循环的时候，取出来的消息将会通过dispatchMessage这个方法进行处理：</p>
-<pre><code>public void dispatchMessage(Message msg) {
-    if (msg.callback != null) {
-        handleCallback(msg);
-    } else {
-        if (mCallback != null) {
-            if (mCallback.handleMessage(msg)) {
-                return;
-            }
-        }
-        handleMessage(msg);
-    }
-}
-</code></pre><p>首先判断的就是msg的callback是否为null，如果不为null就会执行handleCallback(msg)：</p>
-<pre><code>private static void handleCallback(Message message) {
-    message.callback.run();
-}
-</code></pre><p>直接调用了msg的runnable对象也就是我们一开始传给msg的runnable对象，瞬间就很清晰明了了。</p>
+<p>所噶，原来还是通过sendMessageDelayed(Message msg, long delayMillis)这个方法来进行操作的，并且将我们传入的runnable对象通过getPostMessage方法转为了一个Message;那我们再进入getPostMessage方法中一看应该就能明了了：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Message <span class="title">getPostMessage</span><span class="params">(Runnable r)</span> </span>&#123;</span><br><span class="line">    Message m = Message.obtain();</span><br><span class="line">    m.callback = r;</span><br><span class="line">    <span class="keyword">return</span> m;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>创建了一个消息，并把这个消息的callback设置为了我们传入的runnnable；还记得我们上篇文章说过的在Looper进行消息循环的时候，取出来的消息将会通过dispatchMessage这个方法进行处理：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dispatchMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (msg.callback != <span class="keyword">null</span>) &#123;</span><br><span class="line">        handleCallback(msg);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (mCallback != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mCallback.handleMessage(msg)) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        handleMessage(msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>首先判断的就是msg的callback是否为null，如果不为null就会执行handleCallback(msg)：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">handleCallback</span><span class="params">(Message message)</span> </span>&#123;</span><br><span class="line">    message.callback.run();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>直接调用了msg的runnable对象也就是我们一开始传给msg的runnable对象，瞬间就很清晰明了了。</p>
 <ol>
-<li><p>view.post方式<br>view.post方法和handler的写法几乎一致，看看它的里面实现了什么：</p>
-<p> public boolean post(Runnable action) {</p>
-<pre><code>final AttachInfo attachInfo = mAttachInfo;
-if (attachInfo != null) {
-    return attachInfo.mHandler.post(action);
-}
-// Assume that post will succeed later
-ViewRootImpl.getRunQueue().post(action);
-return true;
-</code></pre><p> }</p>
+<li>view.post方式<br>view.post方法和handler的写法几乎一致，看看它的里面实现了什么：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">post</span><span class="params">(Runnable action)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> AttachInfo attachInfo = mAttachInfo;</span><br><span class="line">    <span class="keyword">if</span> (attachInfo != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> attachInfo.mHandler.post(action);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Assume that post will succeed later</span></span><br><span class="line">    ViewRootImpl.getRunQueue().post(action);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
 <p>原来就是通过attachInfo获取到了handler，然后执行handler的post方法而已。换汤不换药。</p>
 <ol>
-<li><p>runOnUiThread方式<br>这个方法其实是属于Activity的方法，也就是只能在Activity中才能使用，代码如下：</p>
-<p> public final void runOnUiThread(Runnable action) {</p>
-<pre><code>if (Thread.currentThread() != mUiThread) {
-    mHandler.post(action);
-} else {
-    action.run();
-}
-</code></pre><p> }</p>
+<li>runOnUiThread方式<br>这个方法其实是属于Activity的方法，也就是只能在Activity中才能使用，代码如下：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">runOnUiThread</span><span class="params">(Runnable action)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Thread.currentThread() != mUiThread) &#123;</span><br><span class="line">        mHandler.post(action);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        action.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
 <p>首先判断了当前线程是否是ui线程，如果不是，就用handler post的方式；否则就直接run。</p>
@@ -316,111 +240,12 @@ return true;
 <li>通过线程1中的looper对象，在主线程中创建一个hanlder对象；</li>
 <li>通过handler发送一个msg，请问这个msg是在哪个线程中收到这个消息并进行处理；</li>
 </ol>
-<p>看下代码：<br>线程1:</p>
-<pre><code>public class LooperThread1 extends Thread {
-
-    /**
-     * 定义一个public的成员变量Looper
-     */
-    public Looper myLooper = null;
-
-    /**
-     * 初始化Looper,开启消息循环
-     */
-    public void initLooper(){
-        Looper.prepare();
-        myLooper = Looper.myLooper();
-        Looper.loop();
-    }
-
-    @Override
-    public void run() {
-        //开启另一个线程
-        Thread thread2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                initLooper();
-            }
-        });
-        thread2.start();
-        Log.e(&quot;test&quot;, &quot;thread2 id:&quot; + thread2.getId());
-    }
-}
-</code></pre><p>主线程：</p>
-<pre><code>//主线程id
-Log.e(&quot;test&quot;, &quot;Main Thread:&quot; + Thread.currentThread().getId());
-LooperThread1 myLooperThread1=new LooperThread1();
-myLooperThread1.start();
-//线程1 id
-Log.e(&quot;test&quot;,&quot;thread1 id:&quot;+myLooperThread1.getId());
-Looper looper=myLooperThread1.myLooper;
-android.os.Handler handler=new android.os.Handler(looper, new android.os.Handler.Callback() {
-    @Override
-    public boolean handleMessage(Message msg) {
-        if(msg.what==111){
-            Log.e(&quot;test&quot;,&quot;handleMessage :111&quot;);
-            //当前线程
-            Log.e(&quot;test&quot;,&quot;current Thread:&quot;+Thread.currentThread().getId());
-        }
-        return false;
-    }
-});
-handler.sendEmptyMessage(111);
-</code></pre><p>最开始我是为了验证这个handler发送的消息最终是在哪个线程中接收，但是其实这段代码是有问题的，一运行会报java.lang.NullPointerException。具体的原因就在与：创建handler的时候，传入的这个looper为空。我们在获取线程1的looper对象时，这个时候可能线程2还没有执行完获取到looper；所以问题就出在这儿；不过我们可以加一个同步锁的方式来解决，但是如果每次写你都去这样操作那不是很麻烦？  所以，android给我们推荐了一个 HandlerThread线程来解决多线程中handler和looper之间同步的问题。</p>
-<p>HandlerThread中的源码：</p>
-<pre><code>@Override
-public void run() {
-    mTid = Process.myTid();
-    Looper.prepare();
-    synchronized (this) {
-        mLooper = Looper.myLooper();
-        notifyAll();
-    }
-    Process.setThreadPriority(mPriority);
-    onLooperPrepared();
-    Looper.loop();
-    mTid = -1;
-}
-
-/**
- * This method returns the Looper associated with this thread. If this thread not been started
- * or for any reason is isAlive() returns false, this method will return null. If this thread 
- * has been started, this method will block until the looper has been initialized. 
- * @return The looper.
- */
-public Looper getLooper() {
-    if (!isAlive()) {
-        return null;
-    }
-
-    // If the thread has been started, wait until the looper has been created.
-    synchronized (this) {
-        while (isAlive() &amp;&amp; mLooper == null) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-            }
-        }
-    }
-    return mLooper;
-}
-</code></pre><p>其实就是加上了一个同步锁的机制，并且在run中自动帮我们创建好了looper；那么我们接下来再来验证下消息的处理是在哪个线程：</p>
-<pre><code>//主线程id
-Log.e(&quot;test&quot;, &quot;Main Thread:&quot; + Thread.currentThread().getId());
-HandlerThread handlerThread = new HandlerThread(&quot;handler_thread&quot;);
-handlerThread.start();
-Log.e(&quot;test&quot;, &quot;HandlerThread:&quot; + handlerThread.getId());
-android.os.Handler handler=new android.os.Handler(handlerThread.getLooper(), new android.os.Handler.Callback() {
-    @Override
-    public boolean handleMessage(Message msg) {
-        if(msg.what==222){
-            Log.e(&quot;test&quot;,&quot;receiveMsh thread id:&quot;+Thread.currentThread().getId());
-        }
-        return false;
-    }
-});
-handler.sendEmptyMessage(222);
-</code></pre><p>打印log为：</p>
+<p>看下代码：<br>线程1:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LooperThread1</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * 定义一个public的成员变量Looper</span><br><span class="line">     */</span></span><br><span class="line">    <span class="keyword">public</span> Looper myLooper = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * 初始化Looper,开启消息循环</span><br><span class="line">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initLooper</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Looper.prepare();</span><br><span class="line">        myLooper = Looper.myLooper();</span><br><span class="line">        Looper.loop();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//开启另一个线程</span></span><br><span class="line">        Thread thread2 = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                initLooper();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        thread2.start();</span><br><span class="line">        Log.e(<span class="string">"test"</span>, <span class="string">"thread2 id:"</span> + thread2.getId());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>主线程：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//主线程id</span></span><br><span class="line">Log.e(<span class="string">"test"</span>, <span class="string">"Main Thread:"</span> + Thread.currentThread().getId());</span><br><span class="line">LooperThread1 myLooperThread1=<span class="keyword">new</span> LooperThread1();</span><br><span class="line">myLooperThread1.start();</span><br><span class="line"><span class="comment">//线程1 id</span></span><br><span class="line">Log.e(<span class="string">"test"</span>,<span class="string">"thread1 id:"</span>+myLooperThread1.getId());</span><br><span class="line">Looper looper=myLooperThread1.myLooper;</span><br><span class="line">android.os.Handler handler=<span class="keyword">new</span> android.os.Handler(looper, <span class="keyword">new</span> android.os.Handler.Callback() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(msg.what==<span class="number">111</span>)&#123;</span><br><span class="line">            Log.e(<span class="string">"test"</span>,<span class="string">"handleMessage :111"</span>);</span><br><span class="line">            <span class="comment">//当前线程</span></span><br><span class="line">            Log.e(<span class="string">"test"</span>,<span class="string">"current Thread:"</span>+Thread.currentThread().getId());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">handler.sendEmptyMessage(<span class="number">111</span>);</span><br></pre></td></tr></table></figure></p>
+<p>最开始我是为了验证这个handler发送的消息最终是在哪个线程中接收，但是其实这段代码是有问题的，一运行会报java.lang.NullPointerException。具体的原因就在与：创建handler的时候，传入的这个looper为空。我们在获取线程1的looper对象时，这个时候可能线程2还没有执行完获取到looper；所以问题就出在这儿；不过我们可以加一个同步锁的方式来解决，但是如果每次写你都去这样操作那不是很麻烦？  所以，android给我们推荐了一个 HandlerThread线程来解决多线程中handler和looper之间同步的问题。</p>
+<p>HandlerThread中的源码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    mTid = Process.myTid();</span><br><span class="line">    Looper.prepare();</span><br><span class="line">    <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">        mLooper = Looper.myLooper();</span><br><span class="line">        notifyAll();</span><br><span class="line">    &#125;</span><br><span class="line">    Process.setThreadPriority(mPriority);</span><br><span class="line">    onLooperPrepared();</span><br><span class="line">    Looper.loop();</span><br><span class="line">    mTid = -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * This method returns the Looper associated with this thread. If this thread not been started</span><br><span class="line"> * or for any reason is isAlive() returns false, this method will return null. If this thread </span><br><span class="line"> * has been started, this method will block until the looper has been initialized. </span><br><span class="line"> * <span class="doctag">@return</span> The looper.</span><br><span class="line"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Looper <span class="title">getLooper</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!isAlive()) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">   </span><br><span class="line">    <span class="comment">// If the thread has been started, wait until the looper has been created.</span></span><br><span class="line">    <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="keyword">while</span> (isAlive() &amp;&amp; mLooper == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                wait();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> mLooper;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其实就是加上了一个同步锁的机制，并且在run中自动帮我们创建好了looper；那么我们接下来再来验证下消息的处理是在哪个线程：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//主线程id</span></span><br><span class="line">Log.e(<span class="string">"test"</span>, <span class="string">"Main Thread:"</span> + Thread.currentThread().getId());</span><br><span class="line">HandlerThread handlerThread = <span class="keyword">new</span> HandlerThread(<span class="string">"handler_thread"</span>);</span><br><span class="line">handlerThread.start();</span><br><span class="line">Log.e(<span class="string">"test"</span>, <span class="string">"HandlerThread:"</span> + handlerThread.getId());</span><br><span class="line">android.os.Handler handler=<span class="keyword">new</span> android.os.Handler(handlerThread.getLooper(), <span class="keyword">new</span> android.os.Handler.Callback() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(msg.what==<span class="number">222</span>)&#123;</span><br><span class="line">            Log.e(<span class="string">"test"</span>,<span class="string">"receiveMsh thread id:"</span>+Thread.currentThread().getId());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">handler.sendEmptyMessage(<span class="number">222</span>);</span><br></pre></td></tr></table></figure></p>
+<p>打印log为：</p>
 <p>得出结论：handler发送的Message处理，不会依赖与创建handler时所在的线程，依赖与传入的looper对象所在的线程，looper所在的线程来执行msg的处理；</p>
 <p>到这里，通过两篇文章总算是将handler这个知识点大部分总结完了；接下来会继续总结其他技术点的知识；如果文章有疏漏，错误，望君能给我评论指出。谢谢！</p>
 

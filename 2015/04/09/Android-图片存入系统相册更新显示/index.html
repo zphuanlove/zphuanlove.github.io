@@ -12,7 +12,7 @@
 <meta property="og:url" content="http://yoursite.com/2015/04/09/Android-图片存入系统相册更新显示/index.html">
 <meta property="og:site_name" content="Peihuan Develop">
 <meta property="og:description" content="在开发android的过程中，我们避免不了可能会涉及到做一个自定义相册或则会去本地创建一个文件夹来存储我们需要的图片。拿相册来说，比如我们创建一个test的文件夹，拍完一张照片后存储到这个指定的test文件夹里，然后在相册里面显示出来，就像微信的效果一样。拍完即可立即显示。但是，在实际开发过程中我们保存完一张图片后并不能立即更新显示出来这个图片，需要我们重启手机才能在系统相册中显示出来。这里先提供">
-<meta property="og:updated_time" content="2016-04-10T04:46:27.659Z">
+<meta property="og:updated_time" content="2016-04-11T09:11:39.506Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android-图片存入系统相册更新显示">
 <meta name="twitter:description" content="在开发android的过程中，我们避免不了可能会涉及到做一个自定义相册或则会去本地创建一个文件夹来存储我们需要的图片。拿相册来说，比如我们创建一个test的文件夹，拍完一张照片后存储到这个指定的test文件夹里，然后在相册里面显示出来，就像微信的效果一样。拍完即可立即显示。但是，在实际开发过程中我们保存完一张图片后并不能立即更新显示出来这个图片，需要我们重启手机才能在系统相册中显示出来。这里先提供">
@@ -200,34 +200,12 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在开发android的过程中，我们避免不了可能会涉及到做一个自定义相册或则会去本地创建一个文件夹来存储我们需要的图片。拿相册来说，比如我们创建一个test的文件夹，拍完一张照片后存储到这个指定的test文件夹里，然后在相册里面显示出来，就像微信的效果一样。拍完即可立即显示。但是，在实际开发过程中我们保存完一张图片后并不能立即更新显示出来这个图片，需要我们重启手机才能在系统相册中显示出来。<br>这里先提供一个插入系统图库的方法：</p>
-<pre><code>MediaStore.Images.Media.insertImage(getContentResolver(), mBitmap, &quot;&quot;, &quot;&quot;);
-</code></pre><p>通过该方法即可把图片插入到系统图库中。但是，插入后并不会立即显示出来，需要发送一个广播：</p>
-<pre><code>sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(&quot;file://&quot;+ Environment.getExternalStorageDirectory()))); 
-</code></pre><p>来通知系统进行整个sd卡的扫描，如果sd里面的东西越多就会扫描的越久，并且扫描中我们不能访问sd卡，所以这样的实现方式对用户来说并不友好。<br><a id="more"></a><br>这里我们可以使用系统api:MediaScannerConnection给我们的方法来进行扫描更新：</p>
-<pre><code>@Override
-protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    mHandler.sendEmptyMessageDelayed(1, 2000);
-
-    mConnection =new MediaScannerConnection(mContext,this);
-}
-
-@Override
-public void onMediaScannerConnected() {
-    mConnection.scanFile(&quot;/sdcard/image.jpg&quot;, &quot;image/jpeg&quot;);
-}
-
-@Override
-public void onScanCompleted(String s, Uri uri) {
-    Log.v(&quot;huan&quot;, &quot;scan completed&quot;);
-    mConnection.disconnect();
-}
-</code></pre><p>但是该种方法我在使用过程中发现一个问题就是：传入的context会被MediaScannerConnection一直持有，导致oom。所以在使用过程中在activity使用时还需要注意。</p>
-<p>另外我们还可以通过指定路径的方式来进行广播，这样就可以避免扫描整个sd卡：</p>
-<pre><code>sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(&quot;file://&quot; + Environment.getExternalStorageDirectory() + picPath)));
-</code></pre><p>图片更新的技巧和注意事项分享给大家，希望对你有帮助。</p>
+        <p>在开发android的过程中，我们避免不了可能会涉及到做一个自定义相册或则会去本地创建一个文件夹来存储我们需要的图片。拿相册来说，比如我们创建一个test的文件夹，拍完一张照片后存储到这个指定的test文件夹里，然后在相册里面显示出来，就像微信的效果一样。拍完即可立即显示。但是，在实际开发过程中我们保存完一张图片后并不能立即更新显示出来这个图片，需要我们重启手机才能在系统相册中显示出来。<br>这里先提供一个插入系统图库的方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MediaStore.Images.Media.insertImage(getContentResolver(), mBitmap, <span class="string">""</span>, <span class="string">""</span>);</span><br></pre></td></tr></table></figure></p>
+<p>通过该方法即可把图片插入到系统图库中。但是，插入后并不会立即显示出来，需要发送一个广播：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sendBroadcast(<span class="keyword">new</span> Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(<span class="string">"file://"</span>+ Environment.getExternalStorageDirectory())));</span><br></pre></td></tr></table></figure></p>
+<p>来通知系统进行整个sd卡的扫描，如果sd里面的东西越多就会扫描的越久，并且扫描中我们不能访问sd卡，所以这样的实现方式对用户来说并不友好。<br><a id="more"></a><br>这里我们可以使用系统api:MediaScannerConnection给我们的方法来进行扫描更新：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">    mHandler.sendEmptyMessageDelayed(<span class="number">1</span>, <span class="number">2000</span>);</span><br><span class="line"></span><br><span class="line">    mConnection =<span class="keyword">new</span> MediaScannerConnection(mContext,<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onMediaScannerConnected</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    mConnection.scanFile(<span class="string">"/sdcard/image.jpg"</span>, <span class="string">"image/jpeg"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onScanCompleted</span><span class="params">(String s, Uri uri)</span> </span>&#123;</span><br><span class="line">    Log.v(<span class="string">"huan"</span>, <span class="string">"scan completed"</span>);</span><br><span class="line">    mConnection.disconnect();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>但是该种方法我在使用过程中发现一个问题就是：传入的context会被MediaScannerConnection一直持有，导致oom。所以在使用过程中在activity使用时还需要注意。</p>
+<p>另外我们还可以通过指定路径的方式来进行广播，这样就可以避免扫描整个sd卡：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sendBroadcast(<span class="keyword">new</span> Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(<span class="string">"file://"</span> + Environment.getExternalStorageDirectory() + picPath)));</span><br></pre></td></tr></table></figure></p>
+<p>图片更新的技巧和注意事项分享给大家，希望对你有帮助。</p>
 
       
     </div>
