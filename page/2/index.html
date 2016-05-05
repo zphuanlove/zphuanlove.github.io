@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>Archives | Peihuan Develop</title>
+  <title>Peihuan Develop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Peihuan Develop">
-<meta property="og:url" content="http://yoursite.com/archives/index.html">
+<meta property="og:url" content="http://yoursite.com/page/2/index.html">
 <meta property="og:site_name" content="Peihuan Develop">
 <meta property="og:description">
 <meta name="twitter:card" content="summary">
@@ -164,207 +164,73 @@
 
       <div class="body-wrap">
   
+    <article id="post-Android-异步消息处理机制-Handler-Looper-Message" class="article article-type-post" itemscope itemprop="blogPost">
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2016" class="archive-year">2016</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/05/05/Android中Drawable分类汇总（上）/" class="archive-article-date">
-  	<time datetime="2016-05-05T12:28:45.857Z" itemprop="datePublished">5月 5</time>
+    <div class="article-meta">
+      <a href="/2015/03/10/Android-异步消息处理机制-Handler-Looper-Message/" class="article-date">
+  	<time datetime="2015-03-09T16:43:15.000Z" itemprop="datePublished">2015-03-10</time>
 </a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+    </div>
   
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
     
     
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/04/23/活在当下/" class="archive-article-date">
-  	<time datetime="2016-04-23T10:16:23.000Z" itemprop="datePublished">4月 23</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
     <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/04/23/活在当下/">活在当下</a>
+      <a class="article-title" href="/2015/03/10/Android-异步消息处理机制-Handler-Looper-Message/">Android-异步消息处理机制-Handler,Looper,Message</a>
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/生活/">生活</a></li></ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
+      </header>
       
-        </div></section>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>相信大部分开发android的人使用Handler在子线程上去进行ui的操作这种模式已经滚瓜烂熟了，但是当你不去深入研究它的原理，和理清它与Looper和Message之间的关系时，遇到问题和bug的时候你就会无从下手，手忙脚乱。</p>
+<p>技术也是一门学问，只知其一不知其二，你永远只会停留在基础。送给自己也是送给大家的一句话：你若不想做，总会找到借口；你若真想做，总会找到方法！</p>
+<p>开始进入正题，什么是异步消息处理机制？<br>就应用程序而已，android系统中java的应用程序和其他系统上相同，都是靠消息驱动来工作的，它们的大致工作原理是：<br>＊有一个消息队列，可以往这个消息队列中不断投递消息（进）<br>＊有一个消息循环，可以不断的从这个消息队列中取出消息，进行处理。（出）<br>事件源把待处理的消息加入到消息队列中（默认是加至队尾，但是也会遇到插队的情况出现，而且不是插中间，直接插入至队列头，这种是属于大哥级别的消息），处理线程从消息队列头不断取出消息分发给对应的target进行处理。这种实现模式在android上主要就是靠我们的Handler，Looper来实现。</p>
+      
+    </div>
+    
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2015" class="archive-year">2015</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/04/20/EditText自动聚焦(FocusableInTouchMode)/" class="archive-article-date">
-  	<time datetime="2015-04-20T11:32:02.000Z" itemprop="datePublished">4月 20</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/04/20/EditText自动聚焦(FocusableInTouchMode)/">EditText自动聚焦-FocusableInTouchMode</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android-控件/">Android 控件</a></li></ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/04/09/Android-图片存入系统相册更新显示/" class="archive-article-date">
-  	<time datetime="2015-04-09T08:47:02.000Z" itemprop="datePublished">4月 9</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/04/09/Android-图片存入系统相册更新显示/">Android-图片存入系统相册更新显示</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android-图片/">Android 图片</a></li></ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/03/15/Android-异步消息处理机制2以及HandlerThread的介绍/" class="archive-article-date">
-  	<time datetime="2015-03-15T08:47:02.000Z" itemprop="datePublished">3月 15</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/03/15/Android-异步消息处理机制2以及HandlerThread的介绍/">Android-异步消息处理机制2以及HandlerThread的介绍</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android-消息机制/">Android 消息机制</a></li></ul>
 	</div>
 
-          
+      
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
+      
+        <p class="article-more-link">
+          <a  href="/2015/03/10/Android-异步消息处理机制-Handler-Looper-Message/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
   </div>
+  
 </article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/03/10/Android-异步消息处理机制-Handler-Looper-Message/" class="archive-article-date">
-  	<time datetime="2015-03-09T16:43:15.000Z" itemprop="datePublished">3月 10</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/03/10/Android-异步消息处理机制-Handler-Looper-Message/">Android-异步消息处理机制-Handler,Looper,Message</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android-消息机制/">Android 消息机制</a></li></ul>
-	</div>
 
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+
+
+
+
+
+
   
   
-    </div></section>
+    <nav id="page-nav">
+      <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+    </nav>
   
-
-    
-
 </div>
       <footer id="footer">
   <div class="outer">
@@ -388,9 +254,9 @@
 		fancybox: true,
 		mathjax: true,
 		animate: true,
-		isHome: false,
+		isHome: true,
 		isPost: false,
-		isArchive: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false
