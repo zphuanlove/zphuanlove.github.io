@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>Peihuan Develop</title>
+  <title>Android中Drawable分类汇总-上 | Peihuan Develop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="Android把可绘制的对象抽象为Drawable，不同的图形图像资源就代表着不同的drawable类型。Android FrameWork提供了一些具体的Drawable实现，通常在代码中都不会直接接触Drawable的实现类。
 在实际的开发过程中，会把使用到的资源都放置在res/drawable目录，剩下的工作交给Android SDK 就行了，当需要使用图片资源的时候，可以使用@drawab">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Peihuan Develop">
+<meta property="og:title" content="Android中Drawable分类汇总-上">
 <meta property="og:url" content="http://yoursite.com/2016/05/05/Android中Drawable分类汇总（上）/index.html">
 <meta property="og:site_name" content="Peihuan Develop">
 <meta property="og:description" content="Android把可绘制的对象抽象为Drawable，不同的图形图像资源就代表着不同的drawable类型。Android FrameWork提供了一些具体的Drawable实现，通常在代码中都不会直接接触Drawable的实现类。
@@ -23,9 +23,9 @@
 <meta property="og:image" content="http://i.imgur.com/FPWbIh9.jpg">
 <meta property="og:image" content="http://i.imgur.com/jTwB5Gv.jpg">
 <meta property="og:image" content="http://i.imgur.com/QsMxrd2.jpg">
-<meta property="og:updated_time" content="2016-05-05T12:28:28.004Z">
+<meta property="og:updated_time" content="2016-05-05T12:33:35.111Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Peihuan Develop">
+<meta name="twitter:title" content="Android中Drawable分类汇总-上">
 <meta name="twitter:description" content="Android把可绘制的对象抽象为Drawable，不同的图形图像资源就代表着不同的drawable类型。Android FrameWork提供了一些具体的Drawable实现，通常在代码中都不会直接接触Drawable的实现类。
 在实际的开发过程中，会把使用到的资源都放置在res/drawable目录，剩下的工作交给Android SDK 就行了，当需要使用图片资源的时候，可以使用@drawab">
 <meta name="twitter:image" content="http://i.imgur.com/XzLyBDi.jpg">
@@ -116,7 +116,7 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/Android-图片/" style="font-size: 10px;">Android 图片</a> <a href="/tags/Android-控件/" style="font-size: 10px;">Android 控件</a> <a href="/tags/Android-消息机制/" style="font-size: 20px;">Android 消息机制</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a>
+						<a href="/tags/Android-Drawable/" style="font-size: 10px;">Android Drawable</a> <a href="/tags/Android-图片/" style="font-size: 10px;">Android 图片</a> <a href="/tags/Android-控件/" style="font-size: 10px;">Android 控件</a> <a href="/tags/Android-消息机制/" style="font-size: 20px;">Android 消息机制</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a>
 					</div>
 				</section>
 				
@@ -180,7 +180,7 @@
   
     <div class="article-meta">
       <a href="/2016/05/05/Android中Drawable分类汇总（上）/" class="article-date">
-  	<time datetime="2016-05-05T12:28:45.857Z" itemprop="datePublished">2016-05-05</time>
+  	<time datetime="2016-05-05T12:29:52.000Z" itemprop="datePublished">2016-05-05</time>
 </a>
     </div>
   
@@ -189,12 +189,35 @@
       <input type="hidden" class="isFancy" />
     
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android中Drawable分类汇总-上
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android-Drawable/">Android Drawable</a></li></ul>
+	</div>
+
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
     <div class="article-entry" itemprop="articleBody">
       
         <p>Android把可绘制的对象抽象为Drawable，不同的图形图像资源就代表着不同的drawable类型。Android FrameWork提供了一些具体的Drawable实现，通常在代码中都不会直接接触Drawable的实现类。</p>
 <p>在实际的开发过程中，会把使用到的资源都放置在res/drawable目录，剩下的工作交给Android SDK 就行了，当需要使用图片资源的时候，可以使用@drawable标志在xml中引用drawable资源就行，也可以在代码中使用id引用这些drawable资源。</p>
 <p>在使用drawable资源的时，有一点需要注意，drawable默认是内存共享的，也就说在不同的地方使用了同一个drawable，它们都指向相同的资源，而且具有相同的状态，如果在一个地方修改了这个drawable，所有使用它的地方都会改变。</p>
 <p>Android内置了如下几种Drawable类型：ColorDrawable、GradientDrawable、BitmapDrawable、 NinePatchDrawable、InsetDrawable、ClipDrawable、ScaleDrawable、RotateDrawable、AnimationDrawable、LayerDrawable、LevelListDrawable、StateListDrawable、TransitionDrawable。</p>
+<a id="more"></a>  
 <p>除了这些预置的drawable实现类以外，也可以自定义drawable的实现类型，大部分情况都不需要自定义drawable类型，使用系统提供的这些drawable实现类型已经覆盖了很多情况。在实际的编程过程中也很少会接触这些具体drawable实现类型，因为编写android应用程序使用xml可以很容易的创建drawable，只有在程序中需要修改drawable的属性时，才需要使用具体的drawable类型提供的方法来处理。下面就来逐个认识这些Drawable类型。</p>
 <h2 id="一、ColorDrawable"><a href="#一、ColorDrawable" class="headerlink" title="一、ColorDrawable"></a>一、ColorDrawable</h2><p>ColorDrawable 是最简单的Drawable，它实际上是代表了单色可绘制区域，它包装了一种固定的颜色，当ColorDrawable被绘制到画布的时候会使用颜色填充Paint，在画布上绘制一块单色的区域。</p>
 <p>在xml文件中使用color作为根节点来创建ColorDrawable，它只有一个android:color属性，通过它来决定ColorDrawable的颜色，Android并没有提供修改这个颜色值的Api，所以这个颜色一旦设置之后，就不能直接修改了。</p>
@@ -287,7 +310,7 @@
 
 <div class="duoshuo">
 	<!-- 多说评论框 start -->
-	<div class="ds-thread" data-thread-key="Android中Drawable分类汇总（上）" data-title="" data-url="http://yoursite.com/2016/05/05/Android中Drawable分类汇总（上）/"></div>
+	<div class="ds-thread" data-thread-key="Android中Drawable分类汇总（上）" data-title="Android中Drawable分类汇总-上" data-url="http://yoursite.com/2016/05/05/Android中Drawable分类汇总（上）/"></div>
 	<!-- 多说评论框 end -->
 	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 	<script type="text/javascript">

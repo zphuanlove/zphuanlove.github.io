@@ -102,7 +102,7 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/Android-图片/" style="font-size: 10px;">Android 图片</a> <a href="/tags/Android-控件/" style="font-size: 10px;">Android 控件</a> <a href="/tags/Android-消息机制/" style="font-size: 20px;">Android 消息机制</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a>
+						<a href="/tags/Android-Drawable/" style="font-size: 10px;">Android Drawable</a> <a href="/tags/Android-图片/" style="font-size: 10px;">Android 图片</a> <a href="/tags/Android-控件/" style="font-size: 10px;">Android 控件</a> <a href="/tags/Android-消息机制/" style="font-size: 20px;">Android 消息机制</a> <a href="/tags/生活/" style="font-size: 10px;">生活</a>
 					</div>
 				</section>
 				
@@ -168,7 +168,7 @@
   
     <div class="article-meta">
       <a href="/2016/05/05/Android中Drawable分类汇总（上）/" class="article-date">
-  	<time datetime="2016-05-05T12:28:45.857Z" itemprop="datePublished">2016-05-05</time>
+  	<time datetime="2016-05-05T12:29:52.000Z" itemprop="datePublished">2016-05-05</time>
 </a>
     </div>
   
@@ -177,67 +177,39 @@
       <input type="hidden" class="isFancy" />
     
     
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/05/Android中Drawable分类汇总（上）/">Android中Drawable分类汇总-上</a>
+    </h1>
+  
+
+      </header>
+      
+    
     <div class="article-entry" itemprop="articleBody">
       
         <p>Android把可绘制的对象抽象为Drawable，不同的图形图像资源就代表着不同的drawable类型。Android FrameWork提供了一些具体的Drawable实现，通常在代码中都不会直接接触Drawable的实现类。</p>
 <p>在实际的开发过程中，会把使用到的资源都放置在res/drawable目录，剩下的工作交给Android SDK 就行了，当需要使用图片资源的时候，可以使用@drawable标志在xml中引用drawable资源就行，也可以在代码中使用id引用这些drawable资源。</p>
 <p>在使用drawable资源的时，有一点需要注意，drawable默认是内存共享的，也就说在不同的地方使用了同一个drawable，它们都指向相同的资源，而且具有相同的状态，如果在一个地方修改了这个drawable，所有使用它的地方都会改变。</p>
 <p>Android内置了如下几种Drawable类型：ColorDrawable、GradientDrawable、BitmapDrawable、 NinePatchDrawable、InsetDrawable、ClipDrawable、ScaleDrawable、RotateDrawable、AnimationDrawable、LayerDrawable、LevelListDrawable、StateListDrawable、TransitionDrawable。</p>
-<p>除了这些预置的drawable实现类以外，也可以自定义drawable的实现类型，大部分情况都不需要自定义drawable类型，使用系统提供的这些drawable实现类型已经覆盖了很多情况。在实际的编程过程中也很少会接触这些具体drawable实现类型，因为编写android应用程序使用xml可以很容易的创建drawable，只有在程序中需要修改drawable的属性时，才需要使用具体的drawable类型提供的方法来处理。下面就来逐个认识这些Drawable类型。</p>
-<h2 id="一、ColorDrawable"><a href="#一、ColorDrawable" class="headerlink" title="一、ColorDrawable"></a>一、ColorDrawable</h2><p>ColorDrawable 是最简单的Drawable，它实际上是代表了单色可绘制区域，它包装了一种固定的颜色，当ColorDrawable被绘制到画布的时候会使用颜色填充Paint，在画布上绘制一块单色的区域。</p>
-<p>在xml文件中使用color作为根节点来创建ColorDrawable，它只有一个android:color属性，通过它来决定ColorDrawable的颜色，Android并没有提供修改这个颜色值的Api，所以这个颜色一旦设置之后，就不能直接修改了。</p>
-<p>下面的xml文件定义了一个颜色为红色的ColorDrawable：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"utf-8"</span>?&gt;</span><br><span class="line">&lt;color xmlns:android=<span class="string">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">android:color=<span class="string">"#FF0000"</span> /&gt;</span><br></pre></td></tr></table></figure></p>
-<p>当然也可以使用Java代码创建ColorDrawable，需要注意的是Android中使用一个int类型的数据表示颜色值，通常习惯使用十六进制格式的数据表示颜色值。一个int类型包含四个字节，分别代表颜色的4个组成部分：透明度（Alpha）、红（RED）、绿（GREEN）、蓝（BLUE），每个部分由一个字节（8个bit）表示，取值范围为0~255。在xml中使用颜色时可以省略透明度（Alpha）部分，如#ff0000表示红色。但是在代码中必须要明确指出透明度（Alpha）代表的数据，如果省略了就表示完全透明的颜色，例如0xFFFF0000表示红色，而0xFF0000虽然也表示红色，但它却是完全透明的，也就是说当绘制到画布上时，看不出有任何效果。</p>
-<p>使用Java代码也可以创建ColorDrawable，代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ColorDrawable drawable = <span class="keyword">new</span> ColorDrawable(<span class="number">0xffff0000</span>);</span><br></pre></td></tr></table></figure></p>
-<h2 id="二、GradientDrawable"><a href="#二、GradientDrawable" class="headerlink" title="二、GradientDrawable"></a>二、GradientDrawable</h2><p>GradientDrawable 表示一个渐变区域，可以实现线性渐变、发散渐变和平铺渐变效果，在Android中可以使用GradientDrawable表示很多复杂而又绚丽的界面效果。</p>
-<p>可以使用xml定义GradientDrawable，相对于ColorDrawable类型，GradientDrawable要复杂很多，它有很多的元素组成。在xml文件中使用shape作为根节点来创建GradientDrawable，它包含很多属性和子节点，下面是GradientDrawable的xml文档节点结构。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line">&lt;shape xmlns:android="http://schemas.android.com/apk/res/android"&gt;</span><br><span class="line">        &lt;size /&gt; //定义区域的大小</span><br><span class="line">        &lt;gradient&gt;//设置区域背景的渐变效果</span><br><span class="line">        &lt;solid/&gt;//设置区域的背景颜色，如果设置了solid会覆盖gradient的效果</span><br><span class="line">        &lt;stroke /&gt;//设置区域的边框效果</span><br><span class="line">        &lt;padding /&gt;//设置区域的内边距</span><br><span class="line">&lt;/shape&gt;</span><br></pre></td></tr></table></figure></p>
-<p>其中每个节点都有许多属性需要设置，以达到不同的渐变效果。</p>
-<p>以下是几种不同渐变效果实现的xml文件代码：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 线性渐变效果的椭圆--&gt;</span><br><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line">&lt;shape</span><br><span class="line">    xmlns:android="http://schemas.android.com/apk/res/android"</span><br><span class="line">    android:shape="oval"&gt;</span><br><span class="line"></span><br><span class="line">    &lt;gradient</span><br><span class="line">        android:startColor="#ff0000"</span><br><span class="line">        android:centerColor="#00ff00"</span><br><span class="line">        android:endColor="#0000ff"</span><br><span class="line">        android:angle="90" /&gt;</span><br><span class="line">    &lt;stroke</span><br><span class="line">        android:width="3dip"</span><br><span class="line">        android:color="#fff"</span><br><span class="line">        android:dashWidth="4dip"</span><br><span class="line">        android:dashGap="5dip" /&gt;</span><br><span class="line">&lt;/shape&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- 平铺渐变效果的圆环--&gt;</span><br><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line">&lt;shape xmlns:android="http://schemas.android.com/apk/res/android"</span><br><span class="line">        android:shape="ring" android:innerRadiusRatio="8"</span><br><span class="line">        android:thicknessRatio="3" android:useLevel="false"&gt;</span><br><span class="line">        &lt;gradient android:type="sweep" android:useLevel="false"</span><br><span class="line">                android:startColor="#ff0000" android:endColor="#0000ff" android:centerColor="#00ff00"/&gt;</span><br><span class="line">&lt;/shape&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- 发散渐变效果的圆--&gt;</span><br><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line">&lt;shape xmlns:android="http://schemas.android.com/apk/res/android"</span><br><span class="line">        android:shape="ring" android:innerRadius="0dip"</span><br><span class="line">        android:thickness="70dip" android:useLevel="false"&gt;</span><br><span class="line">        &lt;gradient android:type="radial" android:useLevel="false" android:gradientRadius="70"</span><br><span class="line">                android:startColor="#ff0000" android:endColor="#0000ff" android:centerColor="#00ff00"/&gt;</span><br><span class="line">&lt;/shape&gt;</span><br></pre></td></tr></table></figure></p>
-<p>以下几幅图展示了上述三个渐变效果：</p>
-<p><img src="http://i.imgur.com/XzLyBDi.jpg" alt=""></p>
-<p>图6-1  线性渐变效果的椭圆</p>
-<p> <img src="http://i.imgur.com/7ORzsRY.jpg" alt=""></p>
-<p>图6-2  平铺渐变效果的圆环</p>
-<p><img src="http://i.imgur.com/j30JZjj.jpg" alt=""></p>
-<p>图6-3  发散渐变效果的圆</p>
-<h2 id="三、BitmapDrawable"><a href="#三、BitmapDrawable" class="headerlink" title="三、BitmapDrawable"></a>三、BitmapDrawable</h2><p>BitmapDrawable 是对bitmap的一种包装，可以设置它包装的bitmap在BitmapDrawable区域内的绘制方式，如平铺填充、拉伸填充或者保持图片原始大小，也可以在BitmapDrawable区域内部使用gravity指定的对齐方式。</p>
-<p>在xml文件中使用bitmap作为根节点来定义BitmapDrawable， 下面列出了bitmap节点的所有属性。</p>
-<p>下面的xml代码定义一个BitmapDrawable，同时设置了BitmapDrawable的tileMode 属性为mirror，通过这样设置会使用小图片在水平和竖直方向做镜面平铺效果。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line">&lt;bitmap xmlns:android="http://schemas.android.com/apk/res/android" </span><br><span class="line">    android:src="@drawable/png_icon_416"</span><br><span class="line">    android:tileMode="mirror"</span><br><span class="line">    android:antialias="true"</span><br><span class="line">    android:dither="true"</span><br><span class="line">    &gt;</span><br><span class="line">&lt;/bitmap&gt;</span><br></pre></td></tr></table></figure></p>
-<p>也可以使用Java代码实现相同的效果，等价的Java代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Bitmap mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.png_icon_416);</span><br><span class="line">BitmapDrawable mBitmapDrawable = <span class="keyword">new</span> BitmapDrawable(mBitmap);</span><br><span class="line">mBitmapDrawable.setTileModeXY(TileMode.MIRROR, TileMode.MIRROR);</span><br><span class="line">mBitmapDrawable.setAntiAlias(<span class="keyword">true</span>);</span><br><span class="line">mBitmapDrawable.setDither(<span class="keyword">true</span>);</span><br><span class="line">mDrawable = mBitmapDrawable;</span><br></pre></td></tr></table></figure></p>
-<p>效果如下图所示：</p>
-<p><img src="http://i.imgur.com/W7z2jG3.jpg" alt=""></p>
-<p>图6-4  BitmapDrawable运行效果图</p>
-<h2 id="四、NinePatchDrawable"><a href="#四、NinePatchDrawable" class="headerlink" title="四、NinePatchDrawable"></a>四、NinePatchDrawable</h2><p>NinePatchDrawable，“点九图”是Andriod平台的一种特殊的图片格式，文件扩展名为：.9.png。支持Android平台的手机类型很多，有多种不同的分辨率，很多控件的切图文件在被放大拉伸后，边角会模糊失真。在android平台下使用“点九”图片处理技术，可以将图片横向和纵向同时进行拉伸，以实现在多分辨率下的完美显示效果。点九图片在拉伸时仍能保留图像的渐变质感和圆角的精细度。</p>
-<p>Android SDK工具集提供了处理点九图片的工具，可以通过draw9patch.bat运行，通过这个工具可以很容易把普通的PNG图片处理成“点九”图片。从它的名字也很容易理解“点九”图的含义，其实相当于把一张PNG图分成了9个部分(九宫格)，分别为4个角，4条边，以及一个中间区域，4个角是不做拉伸的，所以还能一直保持圆角的清晰状态，而2条水平边和2条垂直边分别只做水平和垂直拉伸，所以不会出现边框被拉粗的情况，只有中间用黑线指定的区域做拉伸，通过这种处理方式图片才不会失真。如图6-5所示，对4条黑线分别做了注释。左边和上边的黑线形成的矩形区域是图片的拉伸区域，下边和右边形成的矩形区域是内容所在的区域。黑线可以是连续的也可以是不连续的，不过为了达到最好的显示效果，最好使用连续的黑线。</p>
-<p><img src="http://i.imgur.com/S9cfV4j.png" alt=""></p>
-<p>图6-5  点九图片示意图</p>
-<p> 使用了*.9.png图片技术后，只需要采用一套界面切图去适配不同的分辨率，而且大幅减少安装包的大小。Android FrameWork在显示点九图片时使用了高效的优化算法，所示应用程序不需要专门做处理就可以实现图片拉伸自适应，减少了代码量和实际开发的工作量。 </p>
-<p> 在xml文件中使用使用nine-patch作为根节点创建NinePatchDrawable。同时，也可以使用bitmap包装点九图片，android FrameWork会根据android:src属性设置的图片类型来生成对应的drawable。代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"utf-8"</span>?&gt;</span><br><span class="line">&lt;nine-patch</span><br><span class="line">    xmlns:android=<span class="string">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">    android:src=<span class="string">"@drawable/droid_logo"</span></span><br><span class="line">    android:dither=<span class="string">"true"</span> /&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"utf-8"</span>?&gt;</span><br><span class="line">&lt;bitamp</span><br><span class="line">    xmlns:android=<span class="string">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">    android:src=<span class="string">"@drawable/droid_logo"</span></span><br><span class="line">    android:dither=<span class="string">"true"</span> /&gt;</span><br></pre></td></tr></table></figure></p>
-<p>下面看一下原始点九图片以及拉伸之后的效果：<br><img src="http://i.imgur.com/mCtt5LS.png" alt=""></p>
-<p>图6-6  原始点九图片<br><img src="http://i.imgur.com/FPWbIh9.jpg" alt=""></p>
-<p>图6-7  点九图片拉伸之后的效果</p>
-<p>最后，需要指出的是，Android虽然可以使用Java代码创建NinePatchDrawable，但是极少情况会那么做，主要的原因是由于Android SDK会在编译工程时对点九图片进行编译，形成特殊格式的图片。使用代码创建NinePatchDrawable时只能针对编译过的点九图片资源，对于没有编译过的点九图片资源都当做BitmapDrawable对待。在使用点九图片时需要注意的是，点九图只能适用于拉伸的情况，对于压缩的情况并不适用，如果需要适配很多分辨率的屏幕时需要把点九图做的小一点。</p>
-<h2 id="五、InsetDrawable"><a href="#五、InsetDrawable" class="headerlink" title="五、InsetDrawable"></a>五、InsetDrawable</h2><p>InsetDrawable 表示一个drawable嵌入到另外一个drawable内部，并且在内部留一些间距，这一点很像drawable的padding属性，区别在于 padding表示drawable的内容与drawable本身的边距，insetDrawable表示两个drawable和容器之间的边距。当控件需要的背景比实际的边框小的时候比较适合使用InsetDrawable。</p>
-<p>在xml文件中使用inset作为跟节点定义InsetDrawable。</p>
-<p>下面的xml定义了一个四边边距都为20dip的InsetDrawable，代码如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line">&lt;inset xmlns:android="http://schemas.android.com/apk/res/android" </span><br><span class="line">    android:drawable="@drawable/bitmap_bell"</span><br><span class="line">    android:insetLeft="20dp"</span><br><span class="line">    android:insetRight="20dp"</span><br><span class="line">    android:insetTop="20dp"</span><br><span class="line">    android:insetBottom="20dp"</span><br><span class="line">    &gt;</span><br><span class="line">&lt;/inset&gt;</span><br></pre></td></tr></table></figure></p>
-<p>效果如下图所示：<br><img src="http://i.imgur.com/jTwB5Gv.jpg" alt=""></p>
-<p>图6-8  InsetDrawable运行效果图</p>
-<h2 id="六、ClipDrawable"><a href="#六、ClipDrawable" class="headerlink" title="六、ClipDrawable"></a>六、ClipDrawable</h2><p>ClipDrawable 是对一个Drawable进行剪切操作，可以控制这个drawable的剪切区域，以及相相对于容器的对齐方式，android中的进度条就是使用一个ClipDrawable实现效果的，它根据level的属性值，决定剪切区域的大小。</p>
-<p>在xml文件中使用clip作为根节点定义ClipDrawable。</p>
-<p>需要注意的是ClipDrawable是根据level的大小控制图片剪切操作的，官方文档的note中提到：The drawable is clipped completely and not visible when the level is 0 and fully revealed when the level is 10,000。也就是level的大小从0到10000，level为0时完全不显示，为10000时完全显示。是用Drawable提供的setLevel（int level）方法来设置剪切区域。</p>
-<p>下面为定义ClipDrawable的代码：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line">&lt;clip xmlns:android="http://schemas.android.com/apk/res/android" </span><br><span class="line">    android:clipOrientation="horizontal"</span><br><span class="line">    android:drawable="@drawable/bitmap_android"</span><br><span class="line">    android:gravity="left"</span><br><span class="line">    &gt;</span><br><span class="line">&lt;/clip&gt;</span><br></pre></td></tr></table></figure></p>
-<p>如果没有android:drawable属性，必须要设置一个任意类型的drawable作为子节点，代码如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line">&lt;clip xmlns:android="http://schemas.android.com/apk/res/android" </span><br><span class="line">    android:clipOrientation="horizontal"</span><br><span class="line">    android:gravity="left"</span><br><span class="line">    &gt;</span><br><span class="line">    &lt;bitmap </span><br><span class="line">        android:src="@drawable/android_text"</span><br><span class="line">        android:gravity="center"</span><br><span class="line">        /&gt;</span><br><span class="line">&lt;/clip&gt;</span><br></pre></td></tr></table></figure></p>
-<p>效果如下图所示：<br><img src="http://i.imgur.com/QsMxrd2.jpg" alt=""></p>
-<p>图6-9  ClipDrawable运行效果图</p>
-
       
     </div>
     
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android-Drawable/">Android Drawable</a></li></ul>
+	</div>
+
       
 
+      
+        <p class="article-more-link">
+          <a  href="/2016/05/05/Android中Drawable分类汇总（上）/#more">more >></a>
+        </p>
       
       <div class="clearfix"></div>
     </div>
